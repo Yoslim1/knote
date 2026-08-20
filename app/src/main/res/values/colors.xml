@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2026 Tom Frischmuth — GPLv3. Modified by Yosef, 2026. -->
+<resources>
+
+    <color name="splash_background">#1C1B19</color>
+</resources>

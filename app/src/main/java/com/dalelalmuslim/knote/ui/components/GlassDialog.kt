@@ -1,0 +1,201 @@
+/* Copyright (C) 2026 Tom Frischmuth — GPLv3. Modified by Yosef, 2026. */
+
+package com.dalelalmuslim.knote.ui.components
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.dp
+import com.dalelalmuslim.knote.ui.theme.AppColors
+import com.dalelalmuslim.knote.ui.theme.LocalAppColors
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.HazeStyle
+import dev.chrisbanes.haze.HazeTint
+import dev.chrisbanes.haze.hazeEffect
+
+val LocalHazeState = staticCompositionLocalOf<HazeState?> { null }
+
+internal class GlassOverlayEntry(
+    val onDismissRequest: () -> Unit,
+    val content: @Composable BoxScope.() -> Unit
+)
+
+class GlassOverlayHostState {
+    internal val entries = mutableStateListOf<GlassOverlayEntry>()
+    internal fun push(entry: GlassOverlayEntry) { entries.add(entry) }
+    internal fun remove(entry: GlassOverlayEntry) { entries.remove(entry) }
+}
+
+val LocalGlassOverlayHost = staticCompositionLocalOf<GlassOverlayHostState?> { null }
+
+@Composable
+fun rememberGlassOverlayHostState(): GlassOverlayHostState = remember { GlassOverlayHostState() }
+
+@Composable
+fun GlassOverlayHost(state: GlassOverlayHostState) {
+    state.entries.forEachIndexed { index, entry ->
+        Box(Modifier.fillMaxSize()) {
+            BackHandler(enabled = index == state.entries.lastIndex) { entry.onDismissRequest() }
+            entry.content(this)
+        }
+    }
+}
+
+private fun AppColors.isDark() =
+    (background.red + background.green + background.blue) < 1.5f
+
+private fun dialogScrimStyle(isDark: Boolean) = HazeStyle(
+    blurRadius   = 20.dp,
+    tints        = listOf(HazeTint(Color.Black.copy(alpha = if (isDark) 0.50f else 0.35f))),
+    fallbackTint = HazeTint(Color.Black.copy(alpha = if (isDark) 0.50f else 0.35f))
+)
+
+private fun dialogGlassStyle(isDark: Boolean) = HazeStyle(
+    blurRadius   = 14.dp,
+    tints        = listOf(HazeTint(
+        if (isDark) Color(0xFF0E0E0E).copy(alpha = 0.75f)
+        else        Color.White.copy(alpha = 0.68f)
+    )),
+    fallbackTint = HazeTint(
+        if (isDark) Color(0xFF1C1C1E)
+        else        Color(0xFFF0F0F5)
+    )
+)
+
+private val dialogBorderColor = Color.White.copy(alpha = 0.22f)
+
+@Composable
+private fun DialogSetup(onDismissRequest: () -> Unit, content: @Composable BoxScope.() -> Unit) {
+    val host = LocalGlassOverlayHost.current
+    if (host == null) {
+        Box(Modifier.fillMaxSize(), content = content)
+        return
+    }
+    val currentDismiss by rememberUpdatedState(onDismissRequest)
+    val currentContent by rememberUpdatedState(content)
+    val entry = remember {
+        GlassOverlayEntry(
+            onDismissRequest = { currentDismiss() },
+            content          = { currentContent() }
+        )
+    }
+    DisposableEffect(Unit) {
+        host.push(entry)
+        onDispose { host.remove(entry) }
+    }
+}
+
+@Composable
+private fun BlurScrim(hazeState: HazeState?, isDark: Boolean, onDismissRequest: () -> Unit) {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .then(
+                if (hazeState != null) Modifier.hazeEffect(hazeState, dialogScrimStyle(isDark))
+                else Modifier.background(Color.Black.copy(alpha = 0.40f))
+            )
+            .clickable(indication = null, interactionSource = remember { MutableInteractionSource() }) {
+                onDismissRequest()
+            }
+    )
+}
+
+@Composable
+fun GlassAlertDialog(
+    onDismissRequest: () -> Unit,
+    title: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    confirmButton: @Composable (() -> Unit)? = null,
+    dismissButton: @Composable (() -> Unit)? = null,
+    text: @Composable (() -> Unit)? = null,
+) {
+    val hazeState = LocalHazeState.current
+    val colors    = LocalAppColors.current
+    val isDark    = colors.isDark()
+    val cardShape = RoundedCornerShape(28.dp)
+
+    DialogSetup(onDismissRequest) {
+        BlurScrim(hazeState, isDark, onDismissRequest)
+
+        Column(
+            modifier = modifier
+                .align(Alignment.Center)
+                .imePadding()
+                .padding(horizontal = 32.dp)
+                .fillMaxWidth()
+                .border(0.5.dp, dialogBorderColor, cardShape)
+                .clip(cardShape)
+                .then(
+                    if (hazeState != null) Modifier.hazeEffect(hazeState, dialogGlassStyle(isDark))
+                    else Modifier.background(if (isDark) Color(0xFF1C1C1E) else Color(0xFFF0F0F5))
+                )
+                .clickable(indication = null, interactionSource = remember { MutableInteractionSource() }) { }
+                .padding(24.dp)
+        ) {
+            ProvideTextStyle(MaterialTheme.typography.headlineSmall.copy(color = colors.onSurface)) {
+                title()
+            }
+            if (text != null) {
+                Spacer(Modifier.height(16.dp))
+                ProvideTextStyle(MaterialTheme.typography.bodyMedium.copy(color = colors.onSurfaceSecondary)) {
+                    text()
+                }
+            }
+            if (confirmButton != null || dismissButton != null) {
+                Spacer(Modifier.height(24.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    dismissButton?.invoke()
+                    if (dismissButton != null) Spacer(Modifier.width(8.dp))
+                    confirmButton?.invoke()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun GlassDialog(
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier,
+    shape: Shape = RoundedCornerShape(24.dp),
+    content: @Composable () -> Unit
+) {
+    val hazeState = LocalHazeState.current
+    val colors    = LocalAppColors.current
+    val isDark    = colors.isDark()
+
+    DialogSetup(onDismissRequest) {
+        BlurScrim(hazeState, isDark, onDismissRequest)
+
+        Box(
+            modifier = modifier
+                .align(Alignment.Center)
+                .imePadding()
+                .border(0.5.dp, dialogBorderColor, shape)
+                .clip(shape)
+                .then(
+                    if (hazeState != null) Modifier.hazeEffect(hazeState, dialogGlassStyle(isDark))
+                    else Modifier.background(if (isDark) Color(0xFF1C1C1E) else Color(0xFFF0F0F5))
+                )
+                .clickable(indication = null, interactionSource = remember { MutableInteractionSource() }) { }
+        ) {
+            content()
+        }
+    }
+}

@@ -1,0 +1,104 @@
+/* Copyright (C) 2026 Tom Frischmuth — GPLv3. Modified by Yosef, 2026. */
+
+package com.dalelalmuslim.knote.ui.screens
+
+import androidx.compose.ui.text.AnnotatedString
+import com.dalelalmuslim.knote.ui.theme.DarkAppColors
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+class NoteMarkdownTransformationTest {
+
+    /** Renders [raw] with the cursor sitting on line [cursorLine]. */
+    private fun render(raw: String, cursorLine: Int): String =
+        MarkdownVisualTransformation(DarkAppColors, cursorLine)
+            .filter(AnnotatedString(raw))
+            .text.text
+
+    @Test fun `Spiegelstriche bleiben Spiegelstriche`() {
+        val raw = "# Einkauf\n- Milch\n- Butter"
+        assertEquals("Einkauf\n- Milch\n- Butter", render(raw, cursorLine = 1))
+        assertEquals("Einkauf\n- Milch\n- Butter", render(raw, cursorLine = 2))
+        // Line 0 is the active one, so the heading keeps showing its marker.
+        assertEquals("# Einkauf\n- Milch\n- Butter", render(raw, cursorLine = 0))
+    }
+
+    @Test fun `nur das Sternchen wird zum Punkt`() {
+        assertEquals("• Milch", render("* Milch", cursorLine = 5))
+        assertEquals("• Milch", render("* Milch", cursorLine = 0))
+        assertEquals("- Milch\n• Butter", render("- Milch\n* Butter", cursorLine = 9))
+    }
+
+    @Test fun `Checkboxen werden zum Platzhalter fuer die Ampel`() {
+        val raw = "- [ ] offen\n- [/] laeuft\n- [x] erledigt"
+        val box = CheckPlaceholder
+        assertEquals("$box offen\n$box laeuft\n$box erledigt", render(raw, cursorLine = 0))
+        assertEquals("$box erledigt", render("- [X] erledigt", cursorLine = 0))
+    }
+
+    @Test fun `Nummerierte Listen behalten ihre Zahl`() {
+        val raw = "1. eins\n2. zwei\n10. zehn"
+        assertEquals(raw, render(raw, cursorLine = 0))
+        assertEquals(raw, render(raw, cursorLine = 9))
+    }
+
+    @Test fun `Cursor landet hinter dem Kaestchen`() {
+        val raw = "- [ ] A"
+        val t = MarkdownVisualTransformation(DarkAppColors, 0).filter(AnnotatedString(raw))
+        assertEquals("$CheckPlaceholder A", t.text.text)
+        // The four hidden characters collapse onto the box, "A" keeps its place.
+        assertEquals(2, t.offsetMapping.originalToTransformed(6))
+        assertEquals(6, t.offsetMapping.transformedToOriginal(2))
+    }
+
+    @Test fun `Ueberschriften verstecken ihr Zeichen weiterhin`() {
+        assertEquals("Titel", render("# Titel", cursorLine = 99))
+        assertEquals("# Titel", render("# Titel", cursorLine = 0))
+    }
+
+    @Test fun `Zitate verstecken ihr Zeichen weiterhin`() {
+        assertEquals("Zitat", render("> Zitat", cursorLine = 99))
+    }
+
+    @Test fun `Inline-Auszeichnung in einer Liste wird weiterhin versteckt`() {
+        assertEquals("- fett", render("- **fett**", cursorLine = 99))
+        assertEquals("- **fett**", render("- **fett**", cursorLine = 0))
+    }
+
+    @Test fun `ein Tag bekommt Luft, solange er eine Pille hat`() {
+        val sp = TagSpacer
+        // "#job" sits mid-line and is boxed, "#idee" is still being typed.
+        assertEquals("Notiz $sp#job$sp und #idee", render("Notiz #job und #idee", cursorLine = 0))
+        assertEquals("Notiz $sp#job$sp und $sp#idee$sp", render("Notiz #job und #idee", cursorLine = 1))
+        assertEquals("C#code", render("C#code", cursorLine = 0))
+    }
+
+    @Test fun `ein entwerteter Tag zeigt das Doppelkreuz ohne Pille`() {
+        val out = MarkdownVisualTransformation(DarkAppColors, 0)
+            .filter(AnnotatedString("Text \\#job"))
+        assertEquals("Text #job", out.text.text)
+        assertEquals(
+            emptyList<String>(),
+            out.text.getStringAnnotations(TagPillAnnotation, 0, out.text.length).map { it.item }
+        )
+    }
+
+    @Test fun `eine Pille wird im Text markiert`() {
+        val out = MarkdownVisualTransformation(DarkAppColors, 9)
+            .filter(AnnotatedString("Text #job"))
+        val marks = out.text.getStringAnnotations(TagPillAnnotation, 0, out.text.length)
+        assertEquals(1, marks.size)
+        assertEquals("#job", out.text.text.substring(marks[0].start, marks[0].end))
+    }
+
+    @Test fun `Cursor-Positionen bleiben auf die Quelle abbildbar`() {
+        val raw = "- Milch\n* Butter"
+        val transformed = MarkdownVisualTransformation(DarkAppColors, 0)
+            .filter(AnnotatedString(raw))
+        // The bullet replaces the asterisk one for one, so both directions stay the identity.
+        for (i in 0..raw.length) {
+            assertEquals(i, transformed.offsetMapping.originalToTransformed(i))
+            assertEquals(i, transformed.offsetMapping.transformedToOriginal(i))
+        }
+    }
+}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2026 Tom Frischmuth — GPLv3. Modified by Yosef, 2026. -->
+
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="database" path="knote.db" />
+        <exclude domain="sharedpref" path="knote_keys.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="database" path="knote.db" />
+        <exclude domain="sharedpref" path="knote_keys.xml" />
+    </device-transfer>
+</data-extraction-rules>

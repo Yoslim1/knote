@@ -1,0 +1,272 @@
+/* Copyright (C) 2026 Tom Frischmuth — GPLv3. Modified by Yosef, 2026. */
+
+package com.dalelalmuslim.knote.ui.screens
+import com.dalelalmuslim.knote.ui.components.soundClick
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.dalelalmuslim.knote.security.KeyMode
+import com.dalelalmuslim.knote.ui.brand.KnoteWordmark
+import com.dalelalmuslim.knote.ui.theme.DarkAppColors
+import androidx.compose.ui.platform.LocalContext
+import com.dalelalmuslim.knote.R
+
+@Composable
+fun LockScreen(
+    mode: KeyMode,
+    errorText: String?,
+    keyInvalidated: Boolean,
+    hasRecovery: Boolean,
+    onRequestBiometric: () -> Unit,
+    onSubmitPassphrase: (CharArray) -> Unit,
+    onSubmitRecoveryCode: (CharArray) -> Unit,
+    onReset: () -> Unit,
+) {
+    val context = LocalContext.current
+    val s = remember(context) { lockStrings(context) }
+    val accent = DarkAppColors.accent
+    var showRecovery by remember { mutableStateOf(false) }
+
+    LaunchedEffect(mode, keyInvalidated) {
+        if (mode == KeyMode.KEYSTORE_LOCK && !keyInvalidated) onRequestBiometric()
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(DarkAppColors.background)
+            .padding(horizontal = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        KnoteWordmark(
+            modifier = Modifier.fillMaxWidth(0.6f),
+            letterColor = DarkAppColors.onSurface,
+        )
+        Spacer(Modifier.height(48.dp))
+
+        Icon(
+            imageVector = if (mode == KeyMode.PASSPHRASE) Icons.Filled.Lock else Icons.Filled.Fingerprint,
+            contentDescription = null,
+            tint = accent,
+            modifier = Modifier.height(40.dp),
+        )
+        Spacer(Modifier.height(16.dp))
+
+        Text(
+            text = s.title,
+            color = DarkAppColors.onSurface,
+            fontSize = 18.sp,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = if (mode == KeyMode.PASSPHRASE) s.passphraseHint else s.biometricHint,
+            color = DarkAppColors.onSurfaceSecondary,
+            fontSize = 14.sp,
+            textAlign = TextAlign.Center,
+        )
+
+        Spacer(Modifier.height(24.dp))
+
+        when {
+            keyInvalidated && hasRecovery ->
+                RecoveryEntry(s, accent, s.recoveryMessage, onSubmitRecoveryCode, onReset, onBack = null)
+            keyInvalidated -> InvalidatedRecovery(s, accent, onReset)
+            showRecovery && hasRecovery ->
+                RecoveryEntry(s, accent, s.recoveryPrompt, onSubmitRecoveryCode, onReset, onBack = { showRecovery = false })
+            mode == KeyMode.PASSPHRASE -> {
+                PassphraseEntry(s, accent, onSubmitPassphrase)
+                if (hasRecovery) {
+                    Spacer(Modifier.height(12.dp))
+                    TextButton(onClick = soundClick { showRecovery = true }) {
+                        Text(s.useRecovery, color = accent)
+                    }
+                }
+            }
+            else -> {
+                Button(
+                    onClick = soundClick(onRequestBiometric),
+                    colors = ButtonDefaults.buttonColors(containerColor = accent, contentColor = Color.White),
+                ) { Text(s.unlock) }
+                if (hasRecovery) {
+                    Spacer(Modifier.height(12.dp))
+                    TextButton(onClick = soundClick { showRecovery = true }) {
+                        Text(s.useRecovery, color = accent)
+                    }
+                }
+            }
+        }
+
+        if (errorText != null) {
+            Spacer(Modifier.height(16.dp))
+            Text(errorText, color = Color(0xFFFF6B6B), fontSize = 13.sp, textAlign = TextAlign.Center)
+        }
+    }
+}
+
+@Composable
+private fun PassphraseEntry(
+    s: LockStrings,
+    accent: Color,
+    onSubmit: (CharArray) -> Unit,
+) {
+    var value by remember { mutableStateOf("") }
+    val submit = {
+        if (value.isNotEmpty()) {
+            val chars = value.toCharArray()
+            onSubmit(chars)
+            value = ""
+        }
+    }
+    OutlinedTextField(
+        value = value,
+        onValueChange = { value = it },
+        singleLine = true,
+        visualTransformation = PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = { submit() }),
+        label = { Text(s.passphraseLabel, color = DarkAppColors.onSurfaceSecondary) },
+        modifier = Modifier.fillMaxWidth(),
+    )
+    Spacer(Modifier.height(16.dp))
+    Button(
+        onClick = soundClick(submit),
+        modifier = Modifier.fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(containerColor = accent, contentColor = Color.White),
+    ) { Text(s.unlock) }
+}
+
+@Composable
+private fun RecoveryEntry(
+    s: LockStrings,
+    accent: Color,
+    message: String,
+    onSubmit: (CharArray) -> Unit,
+    onReset: () -> Unit,
+    onBack: (() -> Unit)?,
+) {
+    var value by remember { mutableStateOf("") }
+    val submit = {
+        if (value.isNotBlank()) {
+            onSubmit(value.toCharArray())
+            value = ""
+        }
+    }
+    Text(
+        text = message,
+        color = Color(0xFFFFB74D),
+        fontSize = 14.sp,
+        textAlign = TextAlign.Center,
+    )
+    Spacer(Modifier.height(16.dp))
+    OutlinedTextField(
+        value = value,
+        onValueChange = { value = it },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.Characters,
+            imeAction = ImeAction.Done,
+        ),
+        keyboardActions = KeyboardActions(onDone = { submit() }),
+        label = { Text(s.recoveryLabel, color = DarkAppColors.onSurfaceSecondary) },
+        modifier = Modifier.fillMaxWidth(),
+    )
+    Spacer(Modifier.height(16.dp))
+    Button(
+        onClick = soundClick(submit),
+        modifier = Modifier.fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(containerColor = accent, contentColor = Color.White),
+    ) { Text(s.unlock) }
+    if (onBack != null) {
+        Spacer(Modifier.height(8.dp))
+        TextButton(onClick = soundClick(onBack)) {
+            Text(s.back, color = DarkAppColors.onSurfaceSecondary)
+        }
+    }
+    Spacer(Modifier.height(8.dp))
+    TextButton(onClick = soundClick(onReset)) {
+        Text(s.resetAction, color = DarkAppColors.onSurfaceSecondary)
+    }
+}
+
+@Composable
+private fun InvalidatedRecovery(
+    s: LockStrings,
+    accent: Color,
+    onReset: () -> Unit,
+) {
+    Text(
+        text = s.invalidatedMessage,
+        color = Color(0xFFFFB74D),
+        fontSize = 14.sp,
+        textAlign = TextAlign.Center,
+    )
+    Spacer(Modifier.height(16.dp))
+    TextButton(onClick = soundClick(onReset)) {
+        Text(s.resetAction, color = accent)
+    }
+}
+
+private class LockStrings(
+    val title: String,
+    val biometricHint: String,
+    val passphraseHint: String,
+    val passphraseLabel: String,
+    val unlock: String,
+    val invalidatedMessage: String,
+    val resetAction: String,
+    val recoveryMessage: String,
+    val recoveryLabel: String,
+    val recoveryPrompt: String,
+    val useRecovery: String,
+    val back: String,
+)
+
+private fun lockStrings(ctx: android.content.Context) = LockStrings(
+    title = ctx.getString(R.string.lock_title),
+    biometricHint = ctx.getString(R.string.lock_biometric_hint),
+    passphraseHint = ctx.getString(R.string.lock_passphrase_hint),
+    passphraseLabel = ctx.getString(R.string.lock_passphrase_label),
+    unlock = ctx.getString(R.string.lock_unlock),
+    invalidatedMessage = ctx.getString(R.string.lock_invalidated_message),
+    resetAction = ctx.getString(R.string.lock_reset_action),
+    recoveryMessage = ctx.getString(R.string.lock_recovery_message),
+    recoveryLabel = ctx.getString(R.string.lock_recovery_label),
+    recoveryPrompt = ctx.getString(R.string.lock_recovery_prompt),
+    useRecovery = ctx.getString(R.string.lock_use_recovery),
+    back = ctx.getString(R.string.cancel),
+)

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2026 Tom Frischmuth — GPLv3. Modified by Yosef, 2026. -->
+
+<full-backup-content>
+    <exclude domain="database" path="knote.db" />
+    <exclude domain="sharedpref" path="knote_keys.xml" />
+</full-backup-content>

@@ -1,0 +1,208 @@
+/* Copyright (C) 2026 Tom Frischmuth — GPLv3. Modified by Yosef, 2026. */
+
+package com.dalelalmuslim.knote.ui.screens
+import com.dalelalmuslim.knote.ui.components.*
+import com.dalelalmuslim.knote.ui.*
+
+import androidx.compose.foundation.clickable
+import com.dalelalmuslim.knote.ui.strings.*
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.dalelalmuslim.knote.data.AppSettings
+import java.text.Collator
+import com.dalelalmuslim.knote.ui.theme.LocalAppColors
+
+private val FONT_SCALE_VALUES = listOf(0.85f, 1.0f, 1.15f)
+
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@Composable
+internal fun DarstellungSection(
+    settings: AppSettings,
+    onSetThemeMode: (String) -> Unit,
+    onSetFontScale: (Float) -> Unit,
+    onSetLanguage: (String) -> Unit,
+    onSetConfirmDelete: (Boolean) -> Unit,
+    onSetHaptic: (Boolean) -> Unit,
+    onSetNewNoteStartsWithTitle: (Boolean) -> Unit
+) {
+    val strings = LocalAppStrings.current
+    val colors  = LocalAppColors.current
+
+    val fontLabels = listOf(strings.fontSmall, strings.fontNormal, strings.fontLarge)
+
+    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+        Spacer(Modifier.height(16.dp))
+        SectionLabel(strings.sectionAppearance)
+        Card(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = colors.surface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        ) {
+            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+                Text(strings.modeLabel, fontSize = 13.sp, color = colors.onSurfaceSecondary)
+                Spacer(Modifier.height(8.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf("LIGHT" to strings.modeLight, "DARK" to strings.modeDark, "SYSTEM" to strings.modeSystem).forEach { (mode, label) ->
+                        FilterChip(
+                            selected = settings.themeMode == mode,
+                            onClick  = soundClick { onSetThemeMode(mode) },
+                            label    = { Text(label) },
+                            colors   = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = colors.accent,
+                                selectedLabelColor     = Color.White,
+                                containerColor         = colors.surfaceVariant,
+                                labelColor             = colors.onSurface
+                            )
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(12.dp))
+                HorizontalDivider(color = colors.divider)
+                Spacer(Modifier.height(12.dp))
+
+                Text(strings.fontSizeLabel, fontSize = 13.sp, color = colors.onSurfaceSecondary)
+                Spacer(Modifier.height(8.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FONT_SCALE_VALUES.zip(fontLabels).forEach { (scale, label) ->
+                        FilterChip(
+                            selected = settings.fontScale == scale,
+                            onClick  = soundClick { onSetFontScale(scale) },
+                            label    = { Text(label) },
+                            colors   = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = colors.accent,
+                                selectedLabelColor     = Color.White,
+                                containerColor         = colors.surfaceVariant,
+                                labelColor             = colors.onSurface
+                            )
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(12.dp))
+                HorizontalDivider(color = colors.divider)
+                Spacer(Modifier.height(12.dp))
+
+                Text(strings.languageLabel, fontSize = 13.sp, color = colors.onSurfaceSecondary)
+                Spacer(Modifier.height(8.dp))
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    val langCollator = Collator.getInstance(strings.locale)
+                    val sortedLanguages = listOf(
+                        "de" to strings.langGerman,
+                        "en" to strings.langEnglish,
+                        "es" to strings.langSpanish,
+                        "fr" to strings.langFrench,
+                        "it" to strings.langItalian,
+                        "pt-PT" to strings.langPortuguesePt,
+                        "pt-BR" to strings.langPortugueseBr,
+                        "nl" to strings.langDutch,
+                        "pl" to strings.langPolish,
+                    ).sortedWith(compareBy(langCollator) { it.second })
+                    (listOf("AUTO" to strings.langAuto) + sortedLanguages).forEach { (lang, label) ->
+                        FilterChip(
+                            selected = settings.language == lang,
+                            onClick  = soundClick { onSetLanguage(lang) },
+                            label    = { Text(label) },
+                            colors   = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = colors.accent,
+                                selectedLabelColor     = Color.White,
+                                containerColor         = colors.surfaceVariant,
+                                labelColor             = colors.onSurface
+                            )
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(12.dp))
+                HorizontalDivider(color = colors.divider)
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(strings.confirmDeleteLabel, fontSize = 15.sp, color = colors.onSurface, modifier = Modifier.weight(1f))
+                    Switch(
+                        checked = settings.confirmDeleteEnabled,
+                        onCheckedChange = soundCheck(onSetConfirmDelete),
+                        colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = colors.accent)
+                    )
+                }
+
+                Spacer(Modifier.height(12.dp))
+                HorizontalDivider(color = colors.divider)
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(strings.hapticFeedbackLabel, fontSize = 15.sp, color = colors.onSurface, modifier = Modifier.weight(1f))
+                    Switch(
+                        checked = settings.hapticFeedbackEnabled,
+                        onCheckedChange = soundCheck(onSetHaptic),
+                        colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = colors.accent)
+                    )
+                }
+            }
+        }
+
+        Spacer(Modifier.height(20.dp))
+        SectionLabel(strings.sectionNotes)
+        Card(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = colors.surface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp)) {
+                HorizontalDivider(color = colors.divider)
+                Spacer(Modifier.height(8.dp))
+
+                Text(strings.newNoteStartsWith, fontSize = 13.sp, color = colors.onSurfaceSecondary)
+                Spacer(Modifier.height(8.dp))
+                listOf(true to strings.newNoteTitle, false to strings.newNoteText).forEach { (withTitle, label) ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onSetNewNoteStartsWithTitle(withTitle) }
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = settings.newNoteStartsWithTitle == withTitle,
+                            onClick = soundClick { onSetNewNoteStartsWithTitle(withTitle) },
+                            colors = RadioButtonDefaults.colors(selectedColor = colors.accent)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(label, fontSize = 15.sp, color = colors.onSurface)
+                    }
+                }
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+        AppIconSection()
+
+        Spacer(Modifier.height(10.dp))
+        Text(
+            text = strings.meditationHint,
+            color = colors.onSurfaceSecondary,
+            fontSize = 12.sp,
+            modifier = Modifier.padding(horizontal = 20.dp)
+        )
+        Spacer(Modifier.height(24.dp))
+    }
+}

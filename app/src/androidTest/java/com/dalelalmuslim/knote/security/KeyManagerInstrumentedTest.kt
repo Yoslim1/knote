@@ -1,0 +1,149 @@
+/* Copyright (C) 2026 Tom Frischmuth — GPLv3. Modified by Yosef, 2026. */
+
+package com.dalelalmuslim.knote.security
+
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.runBlocking
+import org.junit.After
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+
+@RunWith(AndroidJUnit4::class)
+class KeyManagerInstrumentedTest {
+
+    private val context: Context get() = ApplicationProvider.getApplicationContext()
+    private lateinit var km: KeyManager
+
+    @Before fun setup() {
+        km = KeyManager(context)
+        km.wipeKeys()
+    }
+
+    @After fun tearDown() {
+        km.wipeKeys()
+    }
+
+    @Test fun noLock_initialize_then_unlockWithoutPrompt_roundtrip() {
+        runBlocking {
+            val dek = km.initialize(KeyMode.KEYSTORE_NO_LOCK)
+            assertEquals(32, dek.size)
+            assertFalse(km.requiresUserPresence())
+            assertArrayEquals(dek, km.unlockWithoutPrompt())
+        }
+    }
+
+    @Test fun passphrase_roundtrip_and_wrongPassphrase_fails() {
+        runBlocking {
+            val dek = km.initialize(KeyMode.PASSPHRASE, "correct horse battery".toCharArray())
+            assertTrue(km.requiresUserPresence())
+            assertArrayEquals(dek, km.unlockWithPassphrase("correct horse battery".toCharArray()))
+        }
+        assertThrows(WrongPassphraseException::class.java) {
+            runBlocking { km.unlockWithPassphrase("wrong".toCharArray()) }
+        }
+    }
+
+    @Test fun switchMode_noLock_to_passphrase_keepsDek() {
+        runBlocking {
+            val dek = km.initialize(KeyMode.KEYSTORE_NO_LOCK)
+            val same = km.switchMode(KeyMode.PASSPHRASE, newPassphrase = "passphrase1".toCharArray())
+            assertArrayEquals(dek, same)
+            assertEquals(KeyMode.PASSPHRASE, km.currentMode())
+            assertArrayEquals(dek, km.unlockWithPassphrase("passphrase1".toCharArray()))
+        }
+    }
+
+    @Test fun switchMode_passphrase_to_noLock_keepsDek() {
+        runBlocking {
+            val dek = km.initialize(KeyMode.PASSPHRASE, "passphrase1".toCharArray())
+            val same = km.switchMode(KeyMode.KEYSTORE_NO_LOCK, currentPassphrase = "passphrase1".toCharArray())
+            assertArrayEquals(dek, same)
+            assertEquals(KeyMode.KEYSTORE_NO_LOCK, km.currentMode())
+            assertArrayEquals(dek, km.unlockWithoutPrompt())
+        }
+    }
+
+    @Test fun changePassphrase_keepsDek_andOldFails() {
+        runBlocking {
+            val dek = km.initialize(KeyMode.PASSPHRASE, "old-passphrase".toCharArray())
+            km.switchMode(
+                KeyMode.PASSPHRASE,
+                currentPassphrase = "old-passphrase".toCharArray(),
+                newPassphrase = "new-passphrase".toCharArray(),
+            )
+            assertArrayEquals(dek, km.unlockWithPassphrase("new-passphrase".toCharArray()))
+        }
+        assertThrows(WrongPassphraseException::class.java) {
+            runBlocking { km.unlockWithPassphrase("old-passphrase".toCharArray()) }
+        }
+    }
+
+    @Test fun unlockWithoutPrompt_inPassphraseMode_throwsWrongMode() {
+        runBlocking { km.initialize(KeyMode.PASSPHRASE, "passphrase1".toCharArray()) }
+        assertThrows(WrongModeException::class.java) { km.unlockWithoutPrompt() }
+    }
+
+    @Test fun rewrap_enableLock_thenDisable_keepsDek_withoutBiometric() {
+        runBlocking {
+            val dek = km.initialize(KeyMode.KEYSTORE_NO_LOCK)
+            km.rewrapDek(dek, KeyMode.KEYSTORE_LOCK)
+            assertEquals(KeyMode.KEYSTORE_LOCK, km.currentMode())
+            assertTrue(km.requiresUserPresence())
+            km.rewrapDek(dek, KeyMode.KEYSTORE_NO_LOCK)
+            assertEquals(KeyMode.KEYSTORE_NO_LOCK, km.currentMode())
+            assertFalse(km.requiresUserPresence())
+            assertArrayEquals(dek, km.unlockWithoutPrompt())
+        }
+    }
+
+    @Test fun requiresUserPresence_matchesMode() {
+        runBlocking {
+            km.initialize(KeyMode.KEYSTORE_NO_LOCK)
+            assertFalse(km.requiresUserPresence())
+            km.switchMode(KeyMode.PASSPHRASE, newPassphrase = "passphrase1".toCharArray())
+            assertTrue(km.requiresUserPresence())
+        }
+    }
+
+    @Test fun recoveryCode_roundtrip_usingDisplayFormat() {
+        runBlocking {
+            val dek = km.initialize(KeyMode.KEYSTORE_NO_LOCK)
+            assertFalse(km.hasRecoveryCode())
+            val display = RecoveryCode.generate()   // grouped, with hyphens
+            km.setRecoveryCode(dek, display.toCharArray())
+            assertTrue(km.hasRecoveryCode())
+            // Unlock with the exact string the user sees / pastes (hyphens, same case).
+            assertArrayEquals(dek, km.unlockWithRecoveryCode(display.toCharArray()))
+            // And with a lower-cased, de-hyphenated variant.
+            assertArrayEquals(dek, km.unlockWithRecoveryCode(display.lowercase().replace("-", "").toCharArray()))
+        }
+    }
+
+    @Test fun recoveryCode_wrongCode_throws() {
+        runBlocking {
+            val dek = km.initialize(KeyMode.KEYSTORE_NO_LOCK)
+            km.setRecoveryCode(dek, RecoveryCode.generate().toCharArray())
+        }
+        assertThrows(WrongRecoveryCodeException::class.java) {
+            runBlocking { km.unlockWithRecoveryCode(RecoveryCode.generate().toCharArray()) }
+        }
+    }
+
+    @Test fun clearRecoveryCode_removesSlot() {
+        runBlocking {
+            val dek = km.initialize(KeyMode.KEYSTORE_NO_LOCK)
+            km.setRecoveryCode(dek, RecoveryCode.generate().toCharArray())
+            assertTrue(km.hasRecoveryCode())
+            km.clearRecoveryCode()
+            assertFalse(km.hasRecoveryCode())
+        }
+    }
+}

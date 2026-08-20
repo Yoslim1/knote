@@ -1,0 +1,84 @@
+/* Copyright (C) 2026 Tom Frischmuth — GPLv3. Modified by Yosef, 2026. */
+
+package com.dalelalmuslim.knote.ui.screens
+
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
+
+private val PillPaddingH = 9.dp
+private val StampCorner   = 5.dp
+
+/**
+ * Height as a multiple of the font size, and how far above the baseline the
+ * letters have their optical centre.
+ *
+ * Both are measured from the baseline rather than the line box: the line box is
+ * taller than the letters and its extra space is distributed proportionally to
+ * the font's ascent and descent, so its middle sits well above the middle of the
+ * word.
+ *
+ * The centre sits half a cap height above the baseline. Reserving room for
+ * descenders instead would leave the pill hanging low under the many tags that
+ * have none, which is more noticeable than the tighter fit under a "j".
+ */
+private const val PillHeightFactor    = 1.5f
+private const val PillCentreAboveBase = 0.36f
+
+/**
+ * Draws the rounded, filled pill behind every finished tag. A span style could
+ * only paint a rectangle, so the shape has to be drawn from the text layout.
+ */
+internal fun DrawScope.drawTagPills(
+    layout: TextLayoutResult,
+    fill: Color,
+    fontSize: TextUnit
+) {
+    // The renderer marked what it wants a box for; re-detecting it here could
+    // not tell an escaped hash from a real tag.
+    val annotated = layout.layoutInput.text
+    drawPills(layout, fill, fontSize, TagPillAnnotation, rounded = true)
+    drawPills(layout, fill, fontSize, StampPillAnnotation, rounded = false)
+}
+
+/** [rounded] tells the tag capsule from the squarer box around a timestamp. */
+private fun DrawScope.drawPills(
+    layout: TextLayoutResult,
+    fill: Color,
+    fontSize: TextUnit,
+    annotation: String,
+    rounded: Boolean
+) {
+    val annotated = layout.layoutInput.text
+    val ranges = annotated
+        .getStringAnnotations(annotation, 0, annotated.length)
+        .map { it.start until it.end }
+    val padH   = PillPaddingH.toPx()
+    val fontPx = fontSize.toPx()
+    val height = fontPx * PillHeightFactor
+    ranges.forEach { range ->
+        if (range.last >= layout.layoutInput.text.length) return@forEach
+        val line = layout.getLineForOffset(range.first)
+        // A tag broken across two lines would need two pills; leave it plain.
+        if (line != layout.getLineForOffset(range.last)) return@forEach
+
+        val start = layout.getBoundingBox(range.first)
+        val end   = layout.getBoundingBox(range.last)
+        val width = (end.right + padH) - (start.left - padH)
+        if (width <= 0f) return@forEach
+
+        val centerY = layout.getLineBaseline(line) - fontPx * PillCentreAboveBase
+        val topLeft = Offset(start.left - padH, centerY - height / 2f)
+        drawRoundRect(
+            color        = fill,
+            topLeft      = topLeft,
+            size         = Size(width, height),
+            cornerRadius = CornerRadius(if (rounded) height / 2f else StampCorner.toPx())
+        )
+    }
+}

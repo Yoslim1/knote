@@ -1,0 +1,563 @@
+/* Copyright (C) 2026 Tom Frischmuth — GPLv3. Modified by Yosef, 2026. */
+
+package com.dalelalmuslim.knote
+
+import android.content.Intent
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
+import android.os.Bundle
+import android.os.LocaleList
+import android.os.SystemClock
+import android.view.ViewTreeObserver
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
+import androidx.compose.ui.platform.LocalContext
+import com.dalelalmuslim.knote.security.KeyInvalidatedException
+import com.dalelalmuslim.knote.security.KeyMode
+import com.dalelalmuslim.knote.security.LocalSecurityController
+import com.dalelalmuslim.knote.security.SecurityController
+import com.dalelalmuslim.knote.security.SecurityGate
+import com.dalelalmuslim.knote.security.WrongPassphraseException
+import com.dalelalmuslim.knote.security.WrongRecoveryCodeException
+import com.dalelalmuslim.knote.security.wipe
+import com.dalelalmuslim.knote.ui.screens.LockScreen
+import com.dalelalmuslim.knote.ui.screens.PostRecoveryLockSetup
+import com.dalelalmuslim.knote.ui.screens.SecBusyDialog
+import com.dalelalmuslim.knote.ui.screens.SecConfirmDialog
+import javax.crypto.Cipher
+import java.util.Locale as JavaLocale
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.withResumed
+import kotlinx.coroutines.launch
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.dalelalmuslim.knote.ui.components.*
+import com.dalelalmuslim.knote.ui.theme.KnoteTheme
+import com.dalelalmuslim.knote.viewmodel.AppViewModel
+import com.dalelalmuslim.knote.viewmodel.MeditationViewModel
+import com.dalelalmuslim.knote.viewmodel.*
+import com.dalelalmuslim.knote.ui.dialogs.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+
+class MainActivity : FragmentActivity() {
+
+    private val _addTaskTrigger  = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val _openTodayTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+
+    companion object {
+        const val ACTION_ADD_TASK   = "com.dalelalmuslim.knote.ACTION_ADD_TASK"
+        const val ACTION_OPEN_TODAY = "com.dalelalmuslim.knote.ACTION_OPEN_TODAY"
+
+        /** smallestScreenWidthDp at/above which the screen counts as "large"
+         *  (e.g. a foldable's unfolded inner display) and orientation is freed. */
+        const val LARGE_SCREEN_SW_DP = 600
+    }
+
+    private val securityController by lazy {
+        SecurityController(
+            appContext = applicationContext,
+            scope = lifecycleScope,
+            biometricPresence = { onSuccess, onError -> authenticateBiometricPresence(onSuccess, onError) },
+        )
+    }
+
+    override fun onStart() {
+        super.onStart()
+        securityController.onAppForegrounded()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        securityController.onAppBackgrounded()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        when (intent.action) {
+            ACTION_ADD_TASK   -> _addTaskTrigger.tryEmit(Unit)
+            ACTION_OPEN_TODAY -> _openTodayTrigger.tryEmit(Unit)
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        applyAdaptiveOrientation(newConfig)
+    }
+
+    /**
+     * Keep portrait locked on phone-sized screens — including a foldable's
+     * narrow cover/folded display — but allow free orientation once the screen
+     * is large (the unfolded inner display). Driven at runtime because the lock
+     * depends on the current configuration, not a static manifest value.
+     */
+    private fun applyAdaptiveOrientation(config: Configuration) {
+        requestedOrientation = if (config.smallestScreenWidthDp >= LARGE_SCREEN_SW_DP) {
+            ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        } else {
+            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        applyAdaptiveOrientation(resources.configuration)
+        when (intent?.action) {
+            ACTION_ADD_TASK   -> _addTaskTrigger.tryEmit(Unit)
+            ACTION_OPEN_TODAY -> _openTodayTrigger.tryEmit(Unit)
+        }
+
+        val startTime = SystemClock.elapsedRealtime()
+        var contentReady = false
+
+        val decorView = window.decorView
+        decorView.filterTouchesWhenObscured = true
+        decorView.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                return if (contentReady && SystemClock.elapsedRealtime() - startTime >= 500L) {
+                    decorView.viewTreeObserver.removeOnPreDrawListener(this)
+                    true
+                } else false
+            }
+        })
+
+        enableEdgeToEdge()
+        setContent {
+            SideEffect { contentReady = true }
+            AppLockGate { showBrandSplash ->
+                UnlockedRoot(showBrandSplash = showBrandSplash)
+            }
+        }
+    }
+
+    @Composable
+    private fun UnlockedRoot(showBrandSplash: Boolean) {
+        val vm: AppViewModel = viewModel()
+        val meditationVm: MeditationViewModel = viewModel()
+        val settingsVm: SettingsViewModel = viewModel()
+        val settings by settingsVm.settings.collectAsStateWithLifecycle()
+        LaunchedEffect(settings.appLockTimeoutSeconds) {
+            securityController.timeoutSeconds = settings.appLockTimeoutSeconds
+        }
+        LaunchedEffect(settings.blockScreenshots) {
+            if (settings.blockScreenshots) {
+                window.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+            } else {
+                window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+            }
+        }
+        KnoteTheme(
+            themeMode = settings.themeMode,
+            fontScale  = settings.fontScale
+        ) {
+            CompositionLocalProvider(LocalSecurityController provides securityController) {
+                Box(Modifier.fillMaxSize()) {
+                    KnoteApp(
+                        vm              = vm,
+                        meditationVm    = meditationVm,
+                        addTaskTrigger  = _addTaskTrigger,
+                        openTodayTrigger = _openTodayTrigger
+                    )
+
+                    // Skip the post-unlock brand splash when the user already
+                    // passed through the lock screen — it would be a redundant
+                    // second wordmark after the gate's own splash + LockScreen.
+                    var brandSplashVisible by remember { mutableStateOf(showBrandSplash) }
+                    LaunchedEffect(Unit) {
+                        if (brandSplashVisible) {
+                            delay(1100)
+                            brandSplashVisible = false
+                        }
+                    }
+                    AnimatedVisibility(visible = brandSplashVisible, exit = fadeOut()) {
+                        BrandSplash()
+                    }
+
+                    if (securityController.relocked) {
+                        ReLockOverlay()
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun ReLockOverlay() {
+        val context = LocalContext.current
+        var error by remember { mutableStateOf<String?>(null) }
+        var invalidated by remember { mutableStateOf(false) }
+        var showResetConfirm by remember { mutableStateOf(false) }
+        var recovered by remember { mutableStateOf(false) }
+        var recovering by remember { mutableStateOf(false) }
+        val scope = rememberCoroutineScope()
+        KnoteTheme(themeMode = "DARK") {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                awaitPointerEvent().changes.forEach { it.consume() }
+                            }
+                        }
+                    }
+            ) {
+            if (recovered) {
+                PostRecoveryLockSetup(
+                    controller = securityController,
+                    onDone = { recovered = false; securityController.clearRelock() },
+                )
+            } else {
+            LockScreen(
+                mode = securityController.mode,
+                errorText = error,
+                keyInvalidated = invalidated,
+                onRequestBiometric = {
+                    error = null
+                    authenticateBiometric(
+                        onSuccess = { securityController.clearRelock() },
+                        onInvalidated = { invalidated = true },
+                        onError = { msg -> error = msg },
+                    )
+                },
+                onSubmitPassphrase = { chars ->
+                    error = null
+                    scope.launch {
+                        try {
+                            SecurityGate.unlockWithPassphrase(context, chars)
+                            securityController.clearRelock()
+                        } catch (e: WrongPassphraseException) {
+                            error = lockErrorWrongPassphrase()
+                        } catch (e: Exception) {
+                            error = e.message
+                        } finally {
+                            chars.wipe()
+                        }
+                    }
+                },
+                hasRecovery = securityController.hasRecovery,
+                onSubmitRecoveryCode = { chars ->
+                    error = null
+                    recovering = true
+                    scope.launch {
+                        try {
+                            SecurityGate.unlockWithRecoveryCode(context, chars)
+                            securityController.refresh()
+                            invalidated = false
+                            recovered = true
+                        } catch (e: WrongRecoveryCodeException) {
+                            error = lockErrorWrongRecoveryCode()
+                        } catch (e: Exception) {
+                            error = e.message
+                        } finally {
+                            chars.wipe()
+                            recovering = false
+                        }
+                    }
+                },
+                onReset = { showResetConfirm = true },
+            )
+            if (showResetConfirm) {
+                SecConfirmDialog(
+                    title = getString(R.string.lock_reset_confirm_title),
+                    message = getString(R.string.lock_reset_confirm_message),
+                    confirmLabel = getString(R.string.lock_reset_confirm_button),
+                    dismissLabel = getString(R.string.cancel),
+                    onConfirm = {
+                        showResetConfirm = false
+                        scope.launch {
+                            SecurityGate.resetAndReinitialize(context)
+                            // A full process restart: recreate() alone would retain the
+                            // Activity's ViewModels (and their cached user data), so we
+                            // relaunch fresh into the now-empty database — no leak.
+                            restartApp()
+                        }
+                    },
+                    onDismiss = { showResetConfirm = false },
+                )
+            }
+            if (recovering) {
+                SecBusyDialog(
+                    getString(R.string.sec_lock_busy_title),
+                    getString(R.string.sec_lock_busy_hint),
+                )
+            }
+            }
+            }
+        }
+    }
+
+    @Composable
+    private fun AppLockGate(content: @Composable (showBrandSplash: Boolean) -> Unit) {
+        val context = LocalContext.current
+        var gate by remember { mutableStateOf<GateState>(GateState.Loading) }
+        var error by remember { mutableStateOf<String?>(null) }
+        var invalidated by remember { mutableStateOf(false) }
+        var showResetConfirm by remember { mutableStateOf(false) }
+        var recovered by remember { mutableStateOf(false) }
+        var recovering by remember { mutableStateOf(false) }
+        // True once a lock screen has been shown — used to suppress the otherwise
+        // redundant post-unlock brand splash.
+        var lockEngaged by remember { mutableStateOf(false) }
+        val scope = rememberCoroutineScope()
+
+        LaunchedEffect(Unit) {
+            gate = runCatching { SecurityGate.prepare(context) }
+                .map {
+                    when (it) {
+                        SecurityGate.StartGate.UNLOCKED -> GateState.Unlocked
+                        SecurityGate.StartGate.NEEDS_BIOMETRIC -> { lockEngaged = true; GateState.Locked(KeyMode.KEYSTORE_LOCK) }
+                        SecurityGate.StartGate.NEEDS_PASSPHRASE -> { lockEngaged = true; GateState.Locked(KeyMode.PASSPHRASE) }
+                    }
+                }
+                .getOrElse { GateState.Failed(it.message) }
+        }
+
+        when (val g = gate) {
+            GateState.Loading -> KnoteTheme(themeMode = "DARK") { BrandSplash() }
+            GateState.Unlocked -> content(!lockEngaged)
+            is GateState.Failed -> KnoteTheme(themeMode = "DARK") { BrandSplash() }
+            is GateState.Locked -> KnoteTheme(themeMode = "DARK") {
+                if (recovered) {
+                    PostRecoveryLockSetup(
+                        controller = securityController,
+                        onDone = { recovered = false; gate = GateState.Unlocked },
+                    )
+                } else {
+                LockScreen(
+                    mode = g.mode,
+                    errorText = error,
+                    keyInvalidated = invalidated,
+                    onRequestBiometric = {
+                        error = null
+                        authenticateBiometric(
+                            onSuccess = { cipher ->
+                                runCatching { SecurityGate.unlockWithKeystore(context, cipher) }
+                                    .onSuccess { securityController.clearRelock(); gate = GateState.Unlocked }
+                                    .onFailure { e ->
+                                        if (e is KeyInvalidatedException) invalidated = true
+                                        else error = e.message
+                                    }
+                            },
+                            onInvalidated = { invalidated = true },
+                            onError = { msg -> error = msg },
+                        )
+                    },
+                    onSubmitPassphrase = { chars ->
+                        error = null
+                        scope.launch {
+                            try {
+                                SecurityGate.unlockWithPassphrase(context, chars)
+                                securityController.clearRelock()
+                                gate = GateState.Unlocked
+                            } catch (e: WrongPassphraseException) {
+                                error = lockErrorWrongPassphrase()
+                            } catch (e: Exception) {
+                                error = e.message
+                            } finally {
+                                chars.wipe()
+                            }
+                        }
+                    },
+                    hasRecovery = securityController.hasRecovery,
+                    onSubmitRecoveryCode = { chars ->
+                        error = null
+                        recovering = true
+                        scope.launch {
+                            try {
+                                SecurityGate.unlockWithRecoveryCode(context, chars)
+                                securityController.clearRelock()
+                                securityController.refresh()
+                                invalidated = false
+                                recovered = true
+                            } catch (e: WrongRecoveryCodeException) {
+                                error = lockErrorWrongRecoveryCode()
+                            } catch (e: Exception) {
+                                error = e.message
+                            } finally {
+                                chars.wipe()
+                                recovering = false
+                            }
+                        }
+                    },
+                    onReset = { showResetConfirm = true },
+                )
+                if (showResetConfirm) {
+                    SecConfirmDialog(
+                        title = getString(R.string.lock_reset_confirm_title),
+                        message = getString(R.string.lock_reset_confirm_message),
+                        confirmLabel = getString(R.string.lock_reset_confirm_button),
+                        dismissLabel = getString(R.string.cancel),
+                        onConfirm = {
+                            showResetConfirm = false
+                            scope.launch {
+                                SecurityGate.resetAndReinitialize(context)
+                                // A full process restart: recreate() alone would retain the
+                                // Activity's ViewModels (and their cached user data), so we
+                                // relaunch fresh into the now-empty database — no leak.
+                                restartApp()
+                            }
+                        },
+                        onDismiss = { showResetConfirm = false },
+                    )
+                }
+                if (recovering) {
+                    SecBusyDialog(
+                        getString(R.string.sec_lock_busy_title),
+                        getString(R.string.sec_lock_busy_hint),
+                    )
+                }
+                }
+            }
+        }
+    }
+
+    /**
+     * Guards against more than one BiometricPrompt being in flight at once. The
+     * lock screen auto-triggers the prompt on appearance *and* exposes an "unlock"
+     * button; without this guard those can overlap (especially during cold-start
+     * settling) and leave the prompt in a state where its result is never delivered.
+     */
+    private var biometricInFlight = false
+
+    private fun clearBiometricInFlight() {
+        biometricInFlight = false
+        SecurityGate.authInProgress = false
+    }
+
+    /**
+     * BiometricPrompt requires the host to be resumed; auto-triggering it from a
+     * Compose effect during cold start can fire before that and drop the result.
+     * Defer the actual prompt until the activity is resumed.
+     */
+    private fun authenticateWhenResumed(showPrompt: () -> Unit) {
+        lifecycleScope.launch { lifecycle.withResumed(showPrompt) }
+    }
+
+    private fun authenticateBiometric(
+        onSuccess: (Cipher) -> Unit,
+        onInvalidated: () -> Unit,
+        onError: (String) -> Unit,
+    ) {
+        if (biometricInFlight) return
+        val cipher = try {
+            SecurityGate.keyManager.getCipherForBiometricPrompt()
+        } catch (e: KeyInvalidatedException) {
+            onInvalidated(); return
+        } catch (e: Exception) {
+            onError(e.message ?: "Fehler"); return
+        }
+        biometricInFlight = true
+        SecurityGate.authInProgress = true
+        val info = BiometricPrompt.PromptInfo.Builder()
+            .setTitle(getString(R.string.bio_unlock_title))
+            .setSubtitle(getString(R.string.bio_confirm_subtitle))
+            .setAllowedAuthenticators(
+                BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                    BiometricManager.Authenticators.DEVICE_CREDENTIAL
+            )
+            .build()
+        val prompt = BiometricPrompt(
+            this,
+            ContextCompat.getMainExecutor(this),
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    clearBiometricInFlight()
+                    val c = result.cryptoObject?.cipher
+                    if (c != null) onSuccess(c) else onError("Kein freigeschalteter Cipher")
+                }
+
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    clearBiometricInFlight()
+                    if (errorCode != BiometricPrompt.ERROR_USER_CANCELED &&
+                        errorCode != BiometricPrompt.ERROR_NEGATIVE_BUTTON &&
+                        errorCode != BiometricPrompt.ERROR_CANCELED
+                    ) {
+                        onError(errString.toString())
+                    }
+                }
+            },
+        )
+        authenticateWhenResumed { prompt.authenticate(info, BiometricPrompt.CryptoObject(cipher)) }
+    }
+
+    private fun authenticateBiometricPresence(onSuccess: () -> Unit, onError: (String) -> Unit) {
+        if (biometricInFlight) return
+        biometricInFlight = true
+        SecurityGate.authInProgress = true
+        val info = BiometricPrompt.PromptInfo.Builder()
+            .setTitle(getString(R.string.bio_confirm_title))
+            .setSubtitle(getString(R.string.bio_confirm_subtitle))
+            .setAllowedAuthenticators(
+                BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                    BiometricManager.Authenticators.DEVICE_CREDENTIAL
+            )
+            .build()
+        val prompt = BiometricPrompt(
+            this,
+            ContextCompat.getMainExecutor(this),
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    clearBiometricInFlight()
+                    onSuccess()
+                }
+
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    clearBiometricInFlight()
+                    if (errorCode != BiometricPrompt.ERROR_USER_CANCELED &&
+                        errorCode != BiometricPrompt.ERROR_NEGATIVE_BUTTON &&
+                        errorCode != BiometricPrompt.ERROR_CANCELED
+                    ) {
+                        onError(errString.toString())
+                    }
+                }
+            },
+        )
+        authenticateWhenResumed { prompt.authenticate(info) }
+    }
+
+    private fun lockErrorWrongPassphrase(): String = getString(R.string.wrong_passphrase)
+
+    private fun lockErrorWrongRecoveryCode(): String = getString(R.string.wrong_recovery_code)
+
+    /**
+     * Relaunches the app in a brand-new process. Used after a full data reset so that
+     * nothing in memory — retained ViewModels, cached flows, singletons — can leak the
+     * wiped data. The launcher activity restarts cleanly into the empty database.
+     */
+    private fun restartApp() {
+        val component = packageManager.getLaunchIntentForPackage(packageName)?.component
+        if (component != null) {
+            startActivity(Intent.makeRestartActivityTask(component))
+            Runtime.getRuntime().exit(0)
+        } else {
+            recreate()
+        }
+    }
+}
+
+internal fun localeListForSetting(setting: String): LocaleList = when (setting) {
+    "", "AUTO" -> LocaleList.getEmptyLocaleList()
+    "DE" -> LocaleList.forLanguageTags("de")
+    "EN" -> LocaleList.forLanguageTags("en")
+    else -> LocaleList.forLanguageTags(setting)
+}
+
+private sealed interface GateState {
+    data object Loading : GateState
+    data object Unlocked : GateState
+    data class Locked(val mode: KeyMode) : GateState
+    data class Failed(val message: String?) : GateState
+}

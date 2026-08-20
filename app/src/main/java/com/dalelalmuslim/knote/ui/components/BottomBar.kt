@@ -1,0 +1,71 @@
+/* Copyright (C) 2026 Tom Frischmuth — GPLv3. Modified by Yosef, 2026. */
+
+package com.dalelalmuslim.knote.ui.components
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.Savings
+import androidx.compose.material.icons.filled.Today
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.dalelalmuslim.knote.ui.strings.LocalAppStrings
+
+enum class AppTab { TODAY, FINANCE, NOTES }
+
+@Composable
+fun BottomBar(
+    currentTab: AppTab,
+    onTabChange: (AppTab) -> Unit,
+    modifier: Modifier = Modifier,
+    showFinance: Boolean = true
+) {
+    val strings = LocalAppStrings.current
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding())
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().height(64.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TabButton(strings.tabToday,   Icons.Default.Today,    currentTab == AppTab.TODAY,   Modifier.weight(1f)) { onTabChange(AppTab.TODAY) }
+            if (showFinance) {
+                TabButton(strings.tabFinance, Icons.Default.Savings, currentTab == AppTab.FINANCE, Modifier.weight(1f)) { onTabChange(AppTab.FINANCE) }
+            }
+            TabButton(strings.tabNotes,   Icons.Default.EditNote, currentTab == AppTab.NOTES,   Modifier.weight(1f)) { onTabChange(AppTab.NOTES) }
+        }
+    }
+}
+
+@Composable
+private fun TabButton(
+    label: String,
+    icon: ImageVector,
+    selected: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    val color = if (selected) Color(0xFF3D5AFE) else Color(0xFF9E9E9E)
+    Column(
+        modifier = modifier
+            .fillMaxHeight()
+            .clickable { onClick() },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(imageVector = icon, contentDescription = label, tint = color, modifier = Modifier.size(22.dp))
+        Spacer(Modifier.height(2.dp))
+        Text(text = label, fontSize = 11.sp, color = color, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal)
+    }
+}

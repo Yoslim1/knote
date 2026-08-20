@@ -1,0 +1,93 @@
+/* Copyright (C) 2026 Tom Frischmuth — GPLv3. Modified by Yosef, 2026. */
+
+package com.dalelalmuslim.knote.data
+
+import android.content.Context
+import net.zetetic.database.sqlcipher.SQLiteDatabase
+import java.io.File
+import java.io.RandomAccessFile
+
+object PlaintextDbMigration {
+
+    private const val DB_NAME = "knote.db"
+    private const val TMP_NAME = "knote_enc_tmp.db"
+
+    private val SQLITE_HEADER = "SQLite format 3".toByteArray(Charsets.US_ASCII) + 0.toByte()
+
+    fun isPlaintextDbPresent(context: Context): Boolean {
+        val file = context.getDatabasePath(DB_NAME)
+        return file.exists() && file.length() >= 16L && readHeader(file).contentEquals(SQLITE_HEADER)
+    }
+
+    fun migrate(context: Context, dek: ByteArray) {
+        if (!isPlaintextDbPresent(context)) return
+
+        val plain = context.getDatabasePath(DB_NAME)
+        val encTmp = context.getDatabasePath(TMP_NAME)
+        deleteDbFileSet(encTmp)
+
+        val oldVersion = readUserVersion(plain)
+        val keyBytes = rawKeyBytes(dek)
+        var enc: SQLiteDatabase? = null
+        try {
+            enc = SQLiteDatabase.openOrCreateDatabase(encTmp, keyBytes, null, null)
+            val escapedPlainPath = plain.absolutePath.replace("'", "''")
+            enc.rawExecSQL("ATTACH DATABASE '$escapedPlainPath' AS plaintext KEY ''")
+            enc.rawExecSQL("SELECT sqlcipher_export('main', 'plaintext')")
+            enc.rawExecSQL("DETACH DATABASE plaintext")
+            enc.rawExecSQL("PRAGMA wal_checkpoint(TRUNCATE)")
+            enc.version = oldVersion
+            enc.close()
+            enc = null
+
+            deleteDbFileSet(plain)
+            moveDbFileSet(encTmp, plain)
+        } catch (t: Throwable) {
+            enc?.close()
+            deleteDbFileSet(encTmp)
+            throw t
+        } finally {
+            keyBytes.fill(0)
+        }
+    }
+
+    private val SIDECARS = listOf("", "-wal", "-shm", "-journal")
+
+    private fun deleteDbFileSet(base: File) {
+        SIDECARS.forEach { File(base.path + it).delete() }
+    }
+
+    private fun moveDbFileSet(from: File, to: File) {
+        SIDECARS.forEach { suffix ->
+            val src = File(from.path + suffix)
+            if (src.exists()) {
+                val dst = File(to.path + suffix)
+                if (!src.renameTo(dst)) {
+                    src.copyTo(dst, overwrite = true)
+                    src.delete()
+                }
+            }
+        }
+    }
+
+    private fun readHeader(file: File): ByteArray {
+        val header = ByteArray(16)
+        RandomAccessFile(file, "r").use { it.readFully(header) }
+        return header
+    }
+
+    private fun readUserVersion(file: File): Int {
+        RandomAccessFile(file, "r").use { raf ->
+            raf.seek(60)
+            val b = ByteArray(4)
+            raf.readFully(b)
+            return ((b[0].toInt() and 0xFF) shl 24) or
+                ((b[1].toInt() and 0xFF) shl 16) or
+                ((b[2].toInt() and 0xFF) shl 8) or
+                (b[3].toInt() and 0xFF)
+        }
+    }
+
+    private fun rawKeyBytes(dek: ByteArray): ByteArray =
+        SqlCipherKey.rawKeyBytes(dek)
+}
