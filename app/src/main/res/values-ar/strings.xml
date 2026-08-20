@@ -1,0 +1,197 @@
+<!-- Copyright (C) 2026 Tom Frischmuth — GPLv3. Modified by Yosef, 2026. -->
+<resources>
+    <string name="app_name" translatable="false">Knote</string>
+    <string name="notif_channel_appointments">تذكيرات المواعيد</string>
+    <string name="notif_channel_appointments_desc">تذكيرات بمواعيد التقويم</string>
+
+    <string name="country_de">ألمانيا</string>
+    <string name="country_at">النمسا</string>
+    <string name="country_ch">سويسرا</string>
+    <string name="country_fr">فرنسا</string>
+    <string name="country_it">إيطاليا</string>
+    <string name="country_es">إسبانيا</string>
+    <string name="country_nl">هولندا</string>
+    <string name="country_pl">بولندا</string>
+    <string name="country_gb">المملكة المتحدة</string>
+    <string name="country_us">الولايات المتحدة</string>
+    <string name="country_pt">البرتغال</string>
+    <string name="country_br">البرازيل</string>
+
+    <string name="holiday_pdf_section">العطلات</string>
+
+    <string name="region_nationwide">على مستوى البلاد</string>
+    <string name="region_de_bw">بادن-فورتمبيرغ</string>
+    <string name="region_de_by">بافاريا</string>
+    <string name="region_de_be">برلين</string>
+    <string name="region_de_bb">براندنبورغ</string>
+    <string name="region_de_hb">بريمن</string>
+    <string name="region_de_hh">هامبورغ</string>
+    <string name="region_de_he">هسن</string>
+    <string name="region_de_mv">مكلنبورغ-فوربومرن</string>
+    <string name="region_de_ni">ساكسونيا السفلى</string>
+    <string name="region_de_nw">شمال الراين-وستفاليا</string>
+    <string name="region_de_rp">راينلاند-بفالتس</string>
+    <string name="region_de_sl">سارلاند</string>
+    <string name="region_de_sn">ساكسونيا</string>
+    <string name="region_de_st">ساكسونيا-أنهالت</string>
+    <string name="region_de_sh">شليسفيغ-هولشتاين</string>
+    <string name="region_de_th">تورينغن</string>
+
+    <string name="holiday_de_neujahr">رأس السنة الجديدة</string>
+    <string name="holiday_de_karfreitag">الجمعة العظيمة</string>
+    <string name="holiday_de_ostermontag">اثنين الفصح</string>
+    <string name="holiday_de_tag_der_arbeit">عيد العمال</string>
+    <string name="holiday_de_christi_himmelfahrt">عيد الصعود</string>
+    <string name="holiday_de_pfingstmontag">اثنين العنصرة</string>
+    <string name="holiday_de_einheit">يوم الوحدة الألمانية</string>
+    <string name="holiday_de_weihnachten_1">عيد الميلاد</string>
+    <string name="holiday_de_weihnachten_2">العيد الثاني لعيد الميلاد</string>
+    <string name="holiday_de_dreikoenige">عيد الغطاس</string>
+    <string name="holiday_de_frauentag">اليوم العالمي للمرأة</string>
+    <string name="holiday_de_fronleichnam">عيد جسد المسيح</string>
+    <string name="holiday_de_mariae_himmelfahrt">عيد انتقال العذراء</string>
+    <string name="holiday_de_weltkindertag">اليوم العالمي للطفل</string>
+    <string name="holiday_de_reformationstag">عيد الإصلاح</string>
+    <string name="holiday_de_allerheiligen">عيد جميع القديسين</string>
+    <string name="holiday_de_buss_und_bettag">يوم التوبة والصلاة</string>
+
+    <string name="holiday_at_neujahr">رأس السنة الجديدة</string>
+    <string name="holiday_at_dreikoenige">عيد الغطاس</string>
+    <string name="holiday_at_ostermontag">اثنين الفصح</string>
+    <string name="holiday_at_staatsfeiertag">العيد الرسمي</string>
+    <string name="holiday_at_himmelfahrt">عيد الصعود</string>
+    <string name="holiday_at_pfingstmontag">اثنين العنصرة</string>
+    <string name="holiday_at_fronleichnam">عيد جسد المسيح</string>
+    <string name="holiday_at_mariae_himmelfahrt">عيد انتقال العذراء</string>
+    <string name="holiday_at_nationalfeiertag">اليوم الوطني</string>
+    <string name="holiday_at_allerheiligen">عيد جميع القديسين</string>
+    <string name="holiday_at_mariae_empfaengnis">عيد الحبل بلا دنس</string>
+    <string name="holiday_at_christtag">عيد الميلاد</string>
+    <string name="holiday_at_stefanitag">عيد القديس ستيفان</string>
+
+    <string name="holiday_ch_neujahr">رأس السنة الجديدة</string>
+    <string name="holiday_ch_karfreitag">الجمعة العظيمة</string>
+    <string name="holiday_ch_ostermontag">اثنين الفصح</string>
+    <string name="holiday_ch_auffahrt">عيد الصعود</string>
+    <string name="holiday_ch_pfingstmontag">اثنين العنصرة</string>
+    <string name="holiday_ch_bundesfeier">العيد الوطني السويسري</string>
+    <string name="holiday_ch_weihnachten">عيد الميلاد</string>
+    <string name="holiday_ch_stephanstag">عيد القديس ستيفان</string>
+
+    <string name="holiday_fr_jour_de_lan">رأس السنة الجديدة</string>
+    <string name="holiday_fr_lundi_paques">اثنين الفصح</string>
+    <string name="holiday_fr_fete_du_travail">عيد العمال</string>
+    <string name="holiday_fr_victoire_1945">يوم النصر في أوروبا</string>
+    <string name="holiday_fr_ascension">عيد الصعود</string>
+    <string name="holiday_fr_lundi_pentecote">اثنين العنصرة</string>
+    <string name="holiday_fr_fete_nationale">يوم الباستيل</string>
+    <string name="holiday_fr_assomption">عيد انتقال العذراء</string>
+    <string name="holiday_fr_toussaint">عيد جميع القديسين</string>
+    <string name="holiday_fr_armistice">يوم الهدنة</string>
+    <string name="holiday_fr_noel">عيد الميلاد</string>
+
+    <string name="holiday_it_capodanno">رأس السنة الجديدة</string>
+    <string name="holiday_it_epifania">عيد الغطاس</string>
+    <string name="holiday_it_pasquetta">اثنين الفصح</string>
+    <string name="holiday_it_liberazione">عيد التحرير</string>
+    <string name="holiday_it_lavoro">عيد العمال</string>
+    <string name="holiday_it_repubblica">عيد الجمهورية</string>
+    <string name="holiday_it_ferragosto">عيد انتقال العذراء</string>
+    <string name="holiday_it_ognissanti">عيد جميع القديسين</string>
+    <string name="holiday_it_immacolata">عيد الحبل بلا دنس</string>
+    <string name="holiday_it_natale">عيد الميلاد</string>
+    <string name="holiday_it_santo_stefano">عيد القديس ستيفان</string>
+
+    <string name="holiday_es_ano_nuevo">رأس السنة الجديدة</string>
+    <string name="holiday_es_reyes">عيد الغطاس</string>
+    <string name="holiday_es_viernes_santo">الجمعة العظيمة</string>
+    <string name="holiday_es_trabajo">عيد العمال</string>
+    <string name="holiday_es_asuncion">عيد انتقال العذراء</string>
+    <string name="holiday_es_fiesta_nacional">اليوم الوطني</string>
+    <string name="holiday_es_todos_los_santos">عيد جميع القديسين</string>
+    <string name="holiday_es_constitucion">يوم الدستور</string>
+    <string name="holiday_es_inmaculada">عيد الحبل بلا دنس</string>
+    <string name="holiday_es_navidad">عيد الميلاد</string>
+
+    <string name="holiday_nl_nieuwjaar">رأس السنة الجديدة</string>
+    <string name="holiday_nl_goede_vrijdag">الجمعة العظيمة</string>
+    <string name="holiday_nl_eerste_paasdag">أحد الفصح</string>
+    <string name="holiday_nl_tweede_paasdag">اثنين الفصح</string>
+    <string name="holiday_nl_koningsdag">عيد الملك</string>
+    <string name="holiday_nl_hemelvaart">عيد الصعود</string>
+    <string name="holiday_nl_eerste_pinksterdag">أحد العنصرة</string>
+    <string name="holiday_nl_tweede_pinksterdag">اثنين العنصرة</string>
+    <string name="holiday_nl_eerste_kerstdag">عيد الميلاد</string>
+    <string name="holiday_nl_tweede_kerstdag">العيد الثاني لعيد الميلاد</string>
+
+    <string name="holiday_pl_nowy_rok">رأس السنة الجديدة</string>
+    <string name="holiday_pl_trzech_kroli">عيد الغطاس</string>
+    <string name="holiday_pl_wielkanoc">أحد الفصح</string>
+    <string name="holiday_pl_poniedzialek_wielkanocny">اثنين الفصح</string>
+    <string name="holiday_pl_swieto_pracy">عيد العمال</string>
+    <string name="holiday_pl_konstytucji">يوم الدستور</string>
+    <string name="holiday_pl_zielone_swiatki">أحد العنصرة</string>
+    <string name="holiday_pl_boze_cialo">عيد جسد المسيح</string>
+    <string name="holiday_pl_wniebowziecie">عيد انتقال العذراء</string>
+    <string name="holiday_pl_wszystkich_swietych">عيد جميع القديسين</string>
+    <string name="holiday_pl_niepodleglosci">عيد الاستقلال</string>
+    <string name="holiday_pl_boze_narodzenie_1">عيد الميلاد</string>
+    <string name="holiday_pl_boze_narodzenie_2">العيد الثاني لعيد الميلاد</string>
+
+    <string name="holiday_gb_new_year">رأس السنة الجديدة</string>
+    <string name="holiday_gb_good_friday">الجمعة العظيمة</string>
+    <string name="holiday_gb_easter_monday">اثنين الفصح</string>
+    <string name="holiday_gb_early_may">عطلة أوائل مايو</string>
+    <string name="holiday_gb_spring_bank">عطلة الربيع الرسمية</string>
+    <string name="holiday_gb_summer_bank">عطلة الصيف الرسمية</string>
+    <string name="holiday_gb_christmas">عيد الميلاد</string>
+    <string name="holiday_gb_boxing_day">العيد الثاني لعيد الميلاد</string>
+
+    <string name="holiday_us_new_year">رأس السنة الجديدة</string>
+    <string name="holiday_us_mlk">يوم مارتن لوثر كينغ</string>
+    <string name="holiday_us_presidents">يوم الرؤساء</string>
+    <string name="holiday_us_memorial">يوم الذكرى</string>
+    <string name="holiday_us_juneteenth">جونتينث</string>
+    <string name="holiday_us_independence">عيد الاستقلال</string>
+    <string name="holiday_us_labor">عيد العمال</string>
+    <string name="holiday_us_columbus">يوم كولومبوس</string>
+    <string name="holiday_us_veterans">يوم المحاربين القدامى</string>
+    <string name="holiday_us_thanksgiving">عيد الشكر</string>
+    <string name="holiday_us_christmas">عيد الميلاد</string>
+
+    <string name="holiday_pt_ano_novo">رأس السنة الجديدة</string>
+    <string name="holiday_pt_sexta_feira_santa">الجمعة العظيمة</string>
+    <string name="holiday_pt_pascoa">أحد الفصح</string>
+    <string name="holiday_pt_dia_da_liberdade">عيد الحرية</string>
+    <string name="holiday_pt_dia_do_trabalhador">عيد العمال</string>
+    <string name="holiday_pt_corpo_de_deus">عيد جسد المسيح</string>
+    <string name="holiday_pt_dia_de_portugal">يوم البرتغال</string>
+    <string name="holiday_pt_assuncao">عيد انتقال العذراء</string>
+    <string name="holiday_pt_implantacao_republica">عيد الجمهورية</string>
+    <string name="holiday_pt_todos_os_santos">عيد جميع القديسين</string>
+    <string name="holiday_pt_restauracao_independencia">ذكرى استعادة الاستقلال</string>
+    <string name="holiday_pt_imaculada_conceicao">عيد الحبل بلا دنس</string>
+    <string name="holiday_pt_natal">عيد الميلاد</string>
+
+    <string name="holiday_br_confraternizacao">رأس السنة الجديدة</string>
+    <string name="holiday_br_sexta_feira_santa">الجمعة العظيمة</string>
+    <string name="holiday_br_tiradentes">يوم تيرادينتس</string>
+    <string name="holiday_br_dia_do_trabalho">عيد العمال</string>
+    <string name="holiday_br_independencia">عيد الاستقلال</string>
+    <string name="holiday_br_aparecida">سيدة أبريسيدا</string>
+    <string name="holiday_br_finados">عيد جميع الأموات</string>
+    <string name="holiday_br_proclamacao_republica">عيد إعلان الجمهورية</string>
+    <string name="holiday_br_consciencia_negra">يوم الوعي الأسود</string>
+    <string name="holiday_br_natal">عيد الميلاد</string>
+
+    <string name="holiday_br_carnaval_segunda">اثنين الكرنفال</string>
+    <string name="holiday_br_carnaval_terca">ثلاثاء الكرنفال</string>
+    <string name="holiday_br_corpus_christi">عيد جسد المسيح</string>
+
+    <!-- Open-source licenses screen -->
+    <string name="lic_intro">هذا التطبيق مبني على برمجيات مفتوحة المصدر. يُعرض كل ترخيص مرة واحدة، تليه المكوّنات التي يغطيها.</string>
+    <string name="lic_license_text">نص الترخيص</string>
+    <string name="lic_notice" translatable="false">NOTICE</string>
+    <string name="lic_public_domain_note">ملكية عامة — لا يلزم ذكر المصدر.</string>
+    <string name="lic_components">المكوّنات (%1$d)</string>
+</resources>
