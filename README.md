@@ -81,7 +81,7 @@ Some things are missing on purpose. Knote will never:
 This is a personal fork, built and signed via GitHub Actions CI. Grab the latest signed APK from the [**Releases**](https://github.com/dalelalmuslim/knote/releases) page, or build it yourself from source.
 
 ### Requirements
-- Android 13+ (minSdk **33**)
+- Android 8.0+ (minSdk **26**)
 
 ---
 
@@ -128,7 +128,7 @@ For a debug build:
 - **Persistence:** Room over SQLCipher
 - **Crypto:** Android Keystore, AndroidX Biometric, Argon2kt
 - **Serialization:** kotlinx.serialization
-- **Min SDK:** 33 (Android 13) · **Target SDK:** 37
+- **Min SDK:** 26 (Android 8.0) · **Target SDK:** 37
 
 ---
 
