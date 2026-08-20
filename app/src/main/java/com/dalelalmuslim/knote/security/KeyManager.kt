@@ -291,10 +291,21 @@ class KeyManager(context: Context) {
                 }
             }
             .setUserAuthenticationRequired(true)
-            .setUserAuthenticationParameters(
-                0,
-                KeyProperties.AUTH_BIOMETRIC_STRONG or KeyProperties.AUTH_DEVICE_CREDENTIAL,
-            )
+            .apply {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    setUserAuthenticationParameters(
+                        0,
+                        KeyProperties.AUTH_BIOMETRIC_STRONG or KeyProperties.AUTH_DEVICE_CREDENTIAL,
+                    )
+                } else {
+                    // Pre-API-30: no combined biometric+credential auth type constant
+                    // exists yet. -1 requires authentication for every single use,
+                    // which is the closest equivalent to "auth required, no grace
+                    // period" on these older API levels.
+                    @Suppress("DEPRECATION")
+                    setUserAuthenticationValidityDurationSeconds(-1)
+                }
+            }
             .setInvalidatedByBiometricEnrollment(false)
             .apply { if (strongBox) setIsStrongBoxBacked(true) }
             .build()

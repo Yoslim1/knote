@@ -27,7 +27,7 @@ android {
 
     defaultConfig {
         applicationId = "com.dalelalmuslim.knote"
-        minSdk = 33
+        minSdk = 26
         targetSdk = 37
         versionCode = 5
         versionName = "1.4"
