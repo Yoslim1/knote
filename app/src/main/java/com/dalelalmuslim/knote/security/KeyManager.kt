@@ -267,7 +267,11 @@ class KeyManager(context: Context) {
             .apply { if (strongBox) setIsStrongBoxBacked(true) }
             .build()
         return try {
-            generator.init(spec(strongBox = true)); generator.generateKey()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                generator.init(spec(strongBox = true)); generator.generateKey()
+            } else {
+                generator.init(spec(strongBox = false)); generator.generateKey()
+            }
         } catch (e: StrongBoxUnavailableException) {
             generator.init(spec(strongBox = false)); generator.generateKey()
         }
@@ -310,7 +314,11 @@ class KeyManager(context: Context) {
             .apply { if (strongBox) setIsStrongBoxBacked(true) }
             .build()
         try {
-            generator.initialize(spec(strongBox = true)); generator.generateKeyPair()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                generator.initialize(spec(strongBox = true)); generator.generateKeyPair()
+            } else {
+                generator.initialize(spec(strongBox = false)); generator.generateKeyPair()
+            }
         } catch (e: StrongBoxUnavailableException) {
             generator.initialize(spec(strongBox = false)); generator.generateKeyPair()
         }

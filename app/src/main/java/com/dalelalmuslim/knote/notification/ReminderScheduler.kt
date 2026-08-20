@@ -7,6 +7,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.core.content.edit
 import com.dalelalmuslim.knote.R
 import com.dalelalmuslim.knote.data.Task
@@ -78,7 +79,14 @@ object ReminderScheduler {
         // The app holds USE_EXACT_ALARM (see AndroidManifest), so canScheduleExactAlarms()
         // is always true here and reminders fire at the exact minute. The inexact branch is
         // kept purely as a defensive fallback and is not reached in normal operation.
-        if (am.canScheduleExactAlarms()) {
+        val canScheduleExact = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            am.canScheduleExactAlarms()
+        } else {
+            // Exact-alarm scheduling permission didn't exist before API 31;
+            // it was always implicitly allowed.
+            true
+        }
+        if (canScheduleExact) {
             am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi)
         } else {
             am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi)
