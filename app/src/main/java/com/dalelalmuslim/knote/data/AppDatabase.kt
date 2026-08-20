@@ -89,9 +89,11 @@ abstract class AppDatabase : RoomDatabase() {
             val factory = SupportOpenHelperFactory(SqlCipherKey.rawKeyBytes(dek))
             return Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "knote.db")
                 .openHelperFactory(factory)
+                // No destructive fallback, intentionally - a missing migration must
+                // fail loudly during development, not silently delete user data in
+                // production. Every schema bump requires a hand-written, tested
+                // Migration object.
                 .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
-                .fallbackToDestructiveMigration(dropAllTables = true)
-                .fallbackToDestructiveMigrationOnDowngrade(dropAllTables = true)
                 .build()
         }
 
