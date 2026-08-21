@@ -22,8 +22,10 @@ benchmark = "1.5.0-alpha06"
 baselineprofile = "1.5.0-alpha06"
 profileinstaller = "1.4.1"
 kotlinxCollectionsImmutable = "0.4.0"
+mockitoCore = "5.23.0"
 
 [libraries]
+mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockitoCore" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

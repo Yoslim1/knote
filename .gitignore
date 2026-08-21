@@ -56,3 +56,4 @@ keystore.properties
 
 # macOS
 .DS_Store
+TASK_*.md
