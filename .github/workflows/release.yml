@@ -1,0 +1,85 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch: {}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-sign-release:
+    name: Build, sign, and publish release APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Decode keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.keystore
+
+      - name: Write keystore.properties
+        run: |
+          cat > keystore.properties << 'PROPS'
+          storeFile=release.keystore
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          PROPS
+
+      - name: Build signed release APK
+        run: ./gradlew :app:assembleRelease --stacktrace
+
+      - name: Locate build-tools (for apksigner)
+        id: build-tools
+        run: |
+          BT_DIR=$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -n1)
+          echo "path=$BT_DIR" >> "$GITHUB_OUTPUT"
+
+      - name: Verify APK signature
+        run: |
+          "${{ steps.build-tools.outputs.path }}apksigner" verify --verbose \
+            app/build/outputs/apk/release/app-release.apk
+
+      - name: Compute SHA-256 checksum
+        id: checksum
+        run: |
+          cd app/build/outputs/apk/release
+          sha256sum app-release.apk > app-release.apk.sha256
+          cat app-release.apk.sha256
+
+      - name: Clean up signing material
+        if: always()
+        run: |
+          rm -f release.keystore keystore.properties
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            app/build/outputs/apk/release/app-release.apk
+            app/build/outputs/apk/release/app-release.apk.sha256
+          generate_release_notes: true
