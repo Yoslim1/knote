@@ -13,7 +13,7 @@ data class AppSettings(
     val financeTabEnabled: Boolean = true,
     /** Whether the mindfulness view can be reached at all. */
     val mindfulnessEnabled: Boolean = true,
-    val themeMode: String = "DARK",
+    val themeMode: String = "SYSTEM",
     val fontScale: Float  = 1.0f,
     val language: String  = "AUTO",
     val salary: Double    = 0.0,

@@ -72,7 +72,7 @@ android {
         buildConfig = true
     }
     androidResources {
-        localeFilters += listOf("en", "de", "es", "fr", "it", "pt", "pt-rPT", "pt-rBR", "nl", "pl")
+        localeFilters += listOf("ar", "en", "de", "es", "fr", "it", "pt", "pt-rPT", "pt-rBR", "nl", "pl")
     }
 }
 

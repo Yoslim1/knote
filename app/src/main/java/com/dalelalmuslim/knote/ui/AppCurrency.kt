@@ -51,6 +51,7 @@ val ALL_CURRENCIES: List<AppCurrency> = listOf(
     AppCurrency("PLN", "zł",   false, true,  2, ','),
     AppCurrency("CZK", "Kč",   false, true,  2, ','),
     AppCurrency("SGD", "S$",   true,  false, 2, '.'),
+    AppCurrency("EGP", "E£",   false, true,  2, '.'),
 )
 
 val DEFAULT_CURRENCY: AppCurrency = ALL_CURRENCIES.first()
@@ -114,5 +115,25 @@ private fun decodeCustom(stored: String): AppCurrency? {
 fun currencyByCode(code: String): AppCurrency =
     if (isCustomCurrency(code)) decodeCustom(code) ?: DEFAULT_CURRENCY
     else ALL_CURRENCIES.find { it.code == code } ?: DEFAULT_CURRENCY
+
+fun defaultCurrencyCodeForLocale(country: String): String = when (country.uppercase()) {
+    "EG" -> "EGP"
+    "US" -> "USD"
+    "GB" -> "GBP"
+    "CH" -> "CHF"
+    "CA" -> "CAD"
+    "AU" -> "AUD"
+    "IN" -> "INR"
+    "IL" -> "ILS"
+    "BR" -> "BRL"
+    "MX" -> "MXN"
+    "SE" -> "SEK"
+    "NO" -> "NOK"
+    "DK" -> "DKK"
+    "PL" -> "PLN"
+    "CZ" -> "CZK"
+    "SG" -> "SGD"
+    else -> DEFAULT_CURRENCY.code
+}
 
 val LocalAppCurrency = staticCompositionLocalOf { DEFAULT_CURRENCY }

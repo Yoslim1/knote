@@ -4,7 +4,9 @@ package com.dalelalmuslim.knote.repository
 
 import androidx.room.withTransaction
 import com.dalelalmuslim.knote.data.*
+import com.dalelalmuslim.knote.ui.defaultCurrencyCodeForLocale
 import kotlinx.coroutines.flow.Flow
+import java.util.Locale
 
 class AppRepository(
     private val db: AppDatabase,
@@ -93,7 +95,9 @@ class AppRepository(
 
     fun getSettings(): Flow<AppSettings?> = settingsDao.observe()
     suspend fun getSettingsOnce(): AppSettings = settingsDao.getOnce() ?: AppSettings()
-    suspend fun initSettings() = settingsDao.insertDefault(AppSettings())
+    suspend fun initSettings() = settingsDao.insertDefault(
+        AppSettings(currency = defaultCurrencyCodeForLocale(Locale.getDefault().country))
+    )
     suspend fun updateSettings(settings: AppSettings) = settingsDao.update(settings)
 
     fun getAllHabits(): Flow<List<Habit>> = habitDao.observeAll()
