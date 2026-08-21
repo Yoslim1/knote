@@ -4,6 +4,7 @@ package com.dalelalmuslim.knote
 
 import android.Manifest
 import android.app.LocaleManager
+import android.os.Build
 import android.content.pm.PackageManager
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -131,10 +132,12 @@ fun KnoteApp(
     val appliedLanguage by settingsVm.appliedLanguage.collectAsStateWithLifecycle()
     LaunchedEffect(appliedLanguage) {
         val lang = appliedLanguage ?: return@LaunchedEffect
-        val lm = appContext.getSystemService(LocaleManager::class.java)
-        val desired = localeListForSetting(lang)
-        if (lm != null && lm.applicationLocales != desired) {
-            lm.applicationLocales = desired
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val lm = appContext.getSystemService(LocaleManager::class.java)
+            val desired = localeListForSetting(lang)
+            if (lm != null && lm.applicationLocales != desired) {
+                lm.applicationLocales = desired
+            }
         }
     }
     val configuration = LocalConfiguration.current

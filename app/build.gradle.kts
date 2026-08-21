@@ -20,6 +20,10 @@ val keystoreProperties = Properties().apply {
 }
 
 android {
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
+
     namespace = "com.dalelalmuslim.knote"
     compileSdk {
         version = release(37)
