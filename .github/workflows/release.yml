@@ -39,7 +39,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Decode keystore
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/release.keystore
 
       - name: Write keystore.properties
         run: |
@@ -74,7 +74,7 @@ jobs:
       - name: Clean up signing material
         if: always()
         run: |
-          rm -f release.keystore keystore.properties
+          rm -f app/release.keystore keystore.properties
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
