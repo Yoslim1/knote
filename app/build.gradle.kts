@@ -28,19 +28,6 @@ val keystoreProperties = Properties().apply {
  * Falls back to "0.0.0" / versionCode 1 if no tag is reachable (e.g. shallow checkout
  * without tags, or a fresh clone with no tags at all) so local/CI debug builds never fail.
  */
-fun gitTagVersionName(): String {
-    return try {
-        val process = ProcessBuilder("git", "describe", "--tags", "--abbrev=0")
-            .redirectErrorStream(true)
-            .start()
-        val output = process.inputStream.bufferedReader().readText().trim()
-        process.waitFor()
-        output.removePrefix("v").ifBlank { "0.0.0" }
-    } catch (e: Exception) {
-        "0.0.0"
-    }
-}
-
 fun versionCodeFromTag(tag: String): Int {
     val parts = tag.split(".").map { it.toIntOrNull() ?: 0 }
     val major = parts.getOrElse(0) { 0 }
@@ -49,7 +36,18 @@ fun versionCodeFromTag(tag: String): Int {
     return (major * 10_000 + minor * 100 + patch).coerceAtLeast(1)
 }
 
-val resolvedVersionName = gitTagVersionName()
+// providers.exec is the configuration-cache-compatible way to run an external
+// process at configuration time (ProcessBuilder/Runtime.exec are rejected by
+// the configuration cache in Gradle 9.x). Runs in the script body so the
+// Project receiver (providers) is resolvable.
+val resolvedVersionName = try {
+    providers.exec {
+        commandLine("git", "describe", "--tags", "--abbrev=0")
+        isIgnoreExitValue = true
+    }.standardOutput.asText.get().trim().removePrefix("v").ifBlank { "0.0.0" }
+} catch (e: Exception) {
+    "0.0.0"
+}
 val resolvedVersionCode = versionCodeFromTag(resolvedVersionName)
 
 android {
