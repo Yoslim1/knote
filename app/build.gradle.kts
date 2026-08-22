@@ -30,13 +30,12 @@ val keystoreProperties = Properties().apply {
  */
 fun gitTagVersionName(): String {
     return try {
-        val out = java.io.ByteArrayOutputStream()
-        exec {
-            commandLine("git", "describe", "--tags", "--abbrev=0")
-            standardOutput = out
-            isIgnoreExitValue = true
-        }
-        out.toString().trim().removePrefix("v").ifBlank { "0.0.0" }
+        val process = ProcessBuilder("git", "describe", "--tags", "--abbrev=0")
+            .redirectErrorStream(true)
+            .start()
+        val output = process.inputStream.bufferedReader().readText().trim()
+        process.waitFor()
+        output.removePrefix("v").ifBlank { "0.0.0" }
     } catch (e: Exception) {
         "0.0.0"
     }
