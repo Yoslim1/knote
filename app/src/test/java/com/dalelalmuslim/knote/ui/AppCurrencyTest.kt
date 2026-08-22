@@ -10,10 +10,10 @@ import java.util.Locale
 
 class AppCurrencyTest {
 
-    @Test fun `ILS steht in der Liste`() {
-        val ils = ALL_CURRENCIES.find { it.code == "ILS" }
-        assertNotNull(ils)
-        assertEquals("₪1234.56", ils!!.format(1234.56))
+    @Test fun `EGP steht in der Liste`() {
+        val egp = ALL_CURRENCIES.find { it.code == "EGP" }
+        assertNotNull(egp)
+        assertEquals("1234.56 E£", egp!!.format(1234.56))
     }
 
     @Test fun `Codes sind eindeutig`() {
