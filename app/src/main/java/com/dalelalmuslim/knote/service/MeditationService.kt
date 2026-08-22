@@ -93,7 +93,15 @@ class MeditationService : Service() {
                 sessionEnded = false
 
                 acquireWakeLock(totalMs + 30_000L)
-                startForeground(NOTIF_ID, buildNotification(remainingMs), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+                // The three-argument startForeground (and the ServiceInfo type
+                // constants) exist only from API 29; on API 26-28 the plain
+                // form is used and the manifest's foregroundServiceType applies.
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    startForeground(NOTIF_ID, buildNotification(remainingMs), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+                } else {
+                    @Suppress("DEPRECATION")
+                    startForeground(NOTIF_ID, buildNotification(remainingMs))
+                }
                 playOpeningBell()
                 startTimer()
                 updateState()
@@ -197,7 +205,7 @@ class MeditationService : Service() {
     }
 
     private fun createNotificationChannel() {
-        val ch = NotificationChannel(CHANNEL_ID, "Meditation", NotificationManager.IMPORTANCE_LOW)
+        val ch = NotificationChannel(CHANNEL_ID, getString(R.string.meditation_channel_name), NotificationManager.IMPORTANCE_LOW)
             .apply { setSound(null, null) }
         getSystemService(NotificationManager::class.java).createNotificationChannel(ch)
     }

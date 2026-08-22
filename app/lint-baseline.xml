@@ -25,28 +25,6 @@
 
     <issue
         id="InlinedApi"
-        message="Field requires API level 29 (current min is 26): `android.os.VibrationEffect#EFFECT_CLICK`"
-        errorLine1="    vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK))"
-        errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/dalelalmuslim/knote/util/Haptics.kt"
-            line="11"
-            column="55"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 29 (current min is 26): `android.content.pm.ServiceInfo#FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK`"
-        errorLine1="                startForeground(NOTIF_ID, buildNotification(remainingMs), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)"
-        errorLine2="                                                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/dalelalmuslim/knote/service/MeditationService.kt"
-            line="96"
-            column="75"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
         message="Field requires API level 33 (current min is 26): `android.Manifest.permission#POST_NOTIFICATIONS`"
         errorLine1="            notifLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)"
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -76,39 +54,6 @@
             file="src/main/java/com/dalelalmuslim/knote/ui/screens/RecoveryCodeScreen.kt"
             line="188"
             column="24"/>
-    </issue>
-
-    <issue
-        id="NewApi"
-        message="Call requires API level 31 (current min is 26): `android.os.VibratorManager#getDefaultVibrator`"
-        errorLine1="    val vibrator = getSystemService(VibratorManager::class.java)?.defaultVibrator ?: return"
-        errorLine2="                                                                  ~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/dalelalmuslim/knote/util/Haptics.kt"
-            line="10"
-            column="67"/>
-    </issue>
-
-    <issue
-        id="NewApi"
-        message="Class requires API level 31 (current min is 26): `android.os.VibratorManager`"
-        errorLine1="    val vibrator = getSystemService(VibratorManager::class.java)?.defaultVibrator ?: return"
-        errorLine2="                                    ~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/dalelalmuslim/knote/util/Haptics.kt"
-            line="10"
-            column="37"/>
-    </issue>
-
-    <issue
-        id="NewApi"
-        message="Call requires API level 29 (current min is 26): `android.os.VibrationEffect#createPredefined`"
-        errorLine1="    vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK))"
-        errorLine2="                                     ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/dalelalmuslim/knote/util/Haptics.kt"
-            line="11"
-            column="38"/>
     </issue>
 
     <issue
@@ -153,17 +98,6 @@
             file="src/main/java/com/dalelalmuslim/knote/security/KeyManager.kt"
             line="322"
             column="21"/>
-    </issue>
-
-    <issue
-        id="NewApi"
-        message="Call requires API level 29 (current min is 26): `android.app.Service#startForeground`"
-        errorLine1="                startForeground(NOTIF_ID, buildNotification(remainingMs), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)"
-        errorLine2="                ~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/dalelalmuslim/knote/service/MeditationService.kt"
-            line="96"
-            column="17"/>
     </issue>
 
     <issue
@@ -7216,16 +7150,4 @@
             line="194"
             column="31"/>
     </issue>
-
-    <issue
-        id="UnusedTranslation"
-        message="The language `ar (Arabic)` is present in this project, but not declared in the `localeConfig` resource"
-        errorLine1="        android:localeConfig=&quot;@xml/locales_config&quot;"
-        errorLine2="                              ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="26"
-            column="31"/>
-    </issue>
-
 </issues>

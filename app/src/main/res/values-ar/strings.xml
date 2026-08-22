@@ -3,6 +3,7 @@
     <string name="app_name" translatable="false">Knote</string>
     <string name="notif_channel_appointments">تذكيرات المواعيد</string>
     <string name="notif_channel_appointments_desc">تذكيرات بمواعيد التقويم</string>
+    <string name="meditation_channel_name">تأمل</string>
 
     <string name="country_de">ألمانيا</string>
     <string name="country_at">النمسا</string>

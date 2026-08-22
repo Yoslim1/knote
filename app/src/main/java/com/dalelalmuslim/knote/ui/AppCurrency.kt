@@ -37,20 +37,6 @@ data class AppCurrency(
 val ALL_CURRENCIES: List<AppCurrency> = listOf(
     AppCurrency("EUR", "€",    false, true,  2, ','),
     AppCurrency("USD", "$",    true,  false, 2, '.'),
-    AppCurrency("GBP", "£",    true,  false, 2, '.'),
-    AppCurrency("CHF", "Fr.",  true,  true,  2, '.'),
-    AppCurrency("CAD", "CA$",  true,  false, 2, '.'),
-    AppCurrency("AUD", "A$",   true,  false, 2, '.'),
-    AppCurrency("INR", "₹",    true,  false, 2, '.'),
-    AppCurrency("ILS", "₪",    true,  false, 2, '.'),
-    AppCurrency("BRL", "R$",   true,  false, 2, ','),
-    AppCurrency("MXN", "MX$",  true,  false, 2, '.'),
-    AppCurrency("SEK", "kr",   false, true,  2, ','),
-    AppCurrency("NOK", "kr",   false, true,  2, ','),
-    AppCurrency("DKK", "kr.",  false, true,  2, ','),
-    AppCurrency("PLN", "zł",   false, true,  2, ','),
-    AppCurrency("CZK", "Kč",   false, true,  2, ','),
-    AppCurrency("SGD", "S$",   true,  false, 2, '.'),
     AppCurrency("EGP", "E£",   false, true,  2, '.'),
 )
 
@@ -119,20 +105,8 @@ fun currencyByCode(code: String): AppCurrency =
 fun defaultCurrencyCodeForLocale(country: String): String = when (country.uppercase()) {
     "EG" -> "EGP"
     "US" -> "USD"
-    "GB" -> "GBP"
-    "CH" -> "CHF"
-    "CA" -> "CAD"
-    "AU" -> "AUD"
-    "IN" -> "INR"
-    "IL" -> "ILS"
-    "BR" -> "BRL"
-    "MX" -> "MXN"
-    "SE" -> "SEK"
-    "NO" -> "NOK"
-    "DK" -> "DKK"
-    "PL" -> "PLN"
-    "CZ" -> "CZK"
-    "SG" -> "SGD"
+    // Eurozone countries default to EUR; everything else falls back to EUR too.
+    "DE", "FR", "IT", "ES", "NL", "PT", "AT", "BE", "IE", "FI", "GR" -> "EUR"
     else -> DEFAULT_CURRENCY.code
 }
 

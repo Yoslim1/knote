@@ -3,6 +3,7 @@
     <string name="app_name" translatable="false">Knote</string>
     <string name="notif_channel_appointments">Appointment reminders</string>
     <string name="notif_channel_appointments_desc">Reminders for calendar appointments</string>
+    <string name="meditation_channel_name">Meditation</string>
 
     <string name="country_de">Germany</string>
     <string name="country_at">Austria</string>

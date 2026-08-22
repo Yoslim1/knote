@@ -19,6 +19,40 @@ val keystoreProperties = Properties().apply {
     if (keystorePropertiesFile.exists()) keystorePropertiesFile.inputStream().use { load(it) }
 }
 
+/**
+ * Derives versionName/versionCode from the latest git tag (e.g. "v1.4.2" -> "1.4.2"),
+ * instead of relying on a hand-edited constant that is easy to forget to bump before
+ * tagging a release (this happened: v1.4.0 and v1.4.1 both shipped as versionCode 5,
+ * which made Android treat them as the same version).
+ *
+ * Falls back to "0.0.0" / versionCode 1 if no tag is reachable (e.g. shallow checkout
+ * without tags, or a fresh clone with no tags at all) so local/CI debug builds never fail.
+ */
+fun gitTagVersionName(): String {
+    return try {
+        val out = java.io.ByteArrayOutputStream()
+        exec {
+            commandLine("git", "describe", "--tags", "--abbrev=0")
+            standardOutput = out
+            isIgnoreExitValue = true
+        }
+        out.toString().trim().removePrefix("v").ifBlank { "0.0.0" }
+    } catch (e: Exception) {
+        "0.0.0"
+    }
+}
+
+fun versionCodeFromTag(tag: String): Int {
+    val parts = tag.split(".").map { it.toIntOrNull() ?: 0 }
+    val major = parts.getOrElse(0) { 0 }
+    val minor = parts.getOrElse(1) { 0 }
+    val patch = parts.getOrElse(2) { 0 }
+    return (major * 10_000 + minor * 100 + patch).coerceAtLeast(1)
+}
+
+val resolvedVersionName = gitTagVersionName()
+val resolvedVersionCode = versionCodeFromTag(resolvedVersionName)
+
 android {
     lint {
         baseline = file("lint-baseline.xml")
@@ -33,8 +67,8 @@ android {
         applicationId = "com.dalelalmuslim.knote"
         minSdk = 26
         targetSdk = 37
-        versionCode = 5
-        versionName = "1.4"
+        versionCode = resolvedVersionCode
+        versionName = resolvedVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -72,7 +106,7 @@ android {
         buildConfig = true
     }
     androidResources {
-        localeFilters += listOf("ar", "en", "de", "es", "fr", "it", "pt", "pt-rPT", "pt-rBR", "nl", "pl")
+        localeFilters += listOf("ar", "en")
     }
 }
 

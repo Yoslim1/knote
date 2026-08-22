@@ -52,6 +52,7 @@
     <string name="lang_portuguese_br">Portuguese (Brazil)</string>
     <string name="lang_dutch">Dutch</string>
     <string name="lang_polish">Polish</string>
+    <string name="lang_arabic" translatable="false">العربية</string>
     <string name="confirm_delete_label">Confirm deletion</string>
     <string name="haptic_feedback_label">Vibrate on check-off</string>
 

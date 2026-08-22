@@ -102,15 +102,8 @@ internal fun DarstellungSection(
                 ) {
                     val langCollator = Collator.getInstance(strings.locale)
                     val sortedLanguages = listOf(
-                        "de" to strings.langGerman,
                         "en" to strings.langEnglish,
-                        "es" to strings.langSpanish,
-                        "fr" to strings.langFrench,
-                        "it" to strings.langItalian,
-                        "pt-PT" to strings.langPortuguesePt,
-                        "pt-BR" to strings.langPortugueseBr,
-                        "nl" to strings.langDutch,
-                        "pl" to strings.langPolish,
+                        "ar" to strings.langArabic,
                     ).sortedWith(compareBy(langCollator) { it.second })
                     (listOf("AUTO" to strings.langAuto) + sortedLanguages).forEach { (lang, label) ->
                         FilterChip(

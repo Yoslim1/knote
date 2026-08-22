@@ -66,6 +66,7 @@ class AppStrings(private val ctx: Context) {
     val langPortugueseBr get() = s(R.string.lang_portuguese_br)
     val langDutch get() = s(R.string.lang_dutch)
     val langPolish get() = s(R.string.lang_polish)
+    val langArabic get() = s(R.string.lang_arabic)
     val confirmDeleteLabel get() = s(R.string.confirm_delete_label)
     val hapticFeedbackLabel get() = s(R.string.haptic_feedback_label)
     val appIconLabel get() = s(R.string.app_icon_label)
