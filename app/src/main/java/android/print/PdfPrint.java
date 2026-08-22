@@ -1,3 +1,5 @@
+/* Copyright (C) 2026 Tom Frischmuth — GPLv3. Modified by Yosef, 2026. */
+
 package android.print;
 
 import android.os.Bundle;
