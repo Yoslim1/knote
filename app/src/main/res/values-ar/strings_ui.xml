@@ -50,8 +50,12 @@
     <string name="bio_unlock_title">فتح التطبيق</string>
     <string name="budget_additional_income_row">+ دخل إضافي</string>
     <plurals name="budget_days_left">
-        <item quantity="one">%d يوم متبقي</item>
-        <item quantity="other">%d أيام متبقية</item>
+        <item quantity="zero">لا أيام متبقية</item>
+        <item quantity="one">%d يوم متبقٍ</item>
+        <item quantity="two">%d يومان متبقيان</item>
+        <item quantity="few">%d أيام متبقية</item>
+        <item quantity="many">%d يومًا متبقيًا</item>
+        <item quantity="other">%d يوم متبقٍ</item>
     </plurals>
     <string name="budget_dialog_title">الميزانية المتاحة</string>
     <string name="budget_no_salary">لم يتم تعيين راتب. الرجاء إدخاله في الإعدادات.</string>
@@ -361,8 +365,12 @@
     <string name="meditation_bell_label">فاصل الجرس</string>
     <string name="meditation_bell_none">لا شيء</string>
     <plurals name="meditation_best_streak">
+        <item quantity="zero">لا توجد سلسلة</item>
         <item quantity="one">أفضل سلسلة: %d يوم</item>
-        <item quantity="other">أفضل سلسلة: %d يومًا</item>
+        <item quantity="two">أفضل سلسلة: يومان</item>
+        <item quantity="few">أفضل سلسلة: %d أيام</item>
+        <item quantity="many">أفضل سلسلة: %d يومًا</item>
+        <item quantity="other">أفضل سلسلة: %d يوم</item>
     </plurals>
     <string name="meditation_breathing">تنفّس بهدوء داخلًا وخارجًا …</string>
     <string name="meditation_duration_label">المدة</string>
@@ -379,8 +387,12 @@
     <string name="meditation_journal_plural">ملاحظات</string>
     <string name="meditation_journal_singular">ملاحظة</string>
     <plurals name="meditation_minutes">
+        <item quantity="zero">0 دقيقة</item>
         <item quantity="one">%d دقيقة</item>
-        <item quantity="other">%d دقائق</item>
+        <item quantity="two">%d دقيقتان</item>
+        <item quantity="few">%d دقائق</item>
+        <item quantity="many">%d دقيقة</item>
+        <item quantity="other">%d دقيقة</item>
     </plurals>
     <string name="meditation_minutes_label">دق</string>
     <string name="meditation_month_days">%1$d من 30 يومًا</string>
@@ -406,15 +418,23 @@
     <string name="meditation_start">ابدأ</string>
     <string name="meditation_stop">إنهاء</string>
     <plurals name="meditation_streak">
+        <item quantity="zero">لا أيام على التوالي</item>
         <item quantity="one">%d يوم على التوالي</item>
-        <item quantity="other">%d أيام على التوالي</item>
+        <item quantity="two">%d يومان على التوالي</item>
+        <item quantity="few">%d أيام على التوالي</item>
+        <item quantity="many">%d يومًا على التوالي</item>
+        <item quantity="other">%d يوم على التوالي</item>
     </plurals>
     <string name="meditation_timer_card">مؤقت التأمل</string>
     <string name="meditation_title">أهلًا باللحظة الحاضرة.</string>
     <string name="meditation_week_days">%1$d من 7 أيام</string>
     <plurals name="meditation_week_entries">
+        <item quantity="zero">لا ملاحظات</item>
         <item quantity="one">%d ملاحظة</item>
-        <item quantity="other">%d ملاحظات</item>
+        <item quantity="two">%d ملاحظتان</item>
+        <item quantity="few">%d ملاحظات</item>
+        <item quantity="many">%d ملاحظة</item>
+        <item quantity="other">%d ملاحظة</item>
     </plurals>
     <string name="menu_calendar">التقويم</string>
     <string name="menu_calendar_subtitle">تذكيرات المواعيد والعطل</string>
@@ -463,20 +483,36 @@
     <string name="notes_checklist_hint">أضف عنصر</string>
     <string name="notes_content_hint">ابدأ الكتابة …</string>
     <plurals name="notes_count">
+        <item quantity="zero">لا ملاحظات</item>
         <item quantity="one">%d ملاحظة</item>
-        <item quantity="other">%d ملاحظات</item>
+        <item quantity="two">%d ملاحظتان</item>
+        <item quantity="few">%d ملاحظات</item>
+        <item quantity="many">%d ملاحظة</item>
+        <item quantity="other">%d ملاحظة</item>
     </plurals>
     <plurals name="notes_count_list">
+        <item quantity="zero">لا قوائم</item>
         <item quantity="one">%d قائمة</item>
-        <item quantity="other">%d قوائم</item>
+        <item quantity="two">%d قائمتان</item>
+        <item quantity="few">%d قوائم</item>
+        <item quantity="many">%d قائمة</item>
+        <item quantity="other">%d قائمة</item>
     </plurals>
     <plurals name="notes_count_note">
+        <item quantity="zero">لا ملاحظات</item>
         <item quantity="one">%d ملاحظة</item>
-        <item quantity="other">%d ملاحظات</item>
+        <item quantity="two">%d ملاحظتان</item>
+        <item quantity="few">%d ملاحظات</item>
+        <item quantity="many">%d ملاحظة</item>
+        <item quantity="other">%d ملاحظة</item>
     </plurals>
     <plurals name="notes_count_routine">
+        <item quantity="zero">لا روتينات</item>
         <item quantity="one">%d روتين</item>
-        <item quantity="other">%d روتينات</item>
+        <item quantity="two">%d روتينان</item>
+        <item quantity="few">%d روتينات</item>
+        <item quantity="many">%d روتينًا</item>
+        <item quantity="other">%d روتين</item>
     </plurals>
     <string name="notes_delete_selected">نقل العناصر المحددة إلى سلة المحذوفات</string>
     <string name="notes_done">تم</string>
@@ -495,8 +531,12 @@
     <string name="notes_pinned_section">المثبتة</string>
     <string name="notes_search_hint">بحث …</string>
     <plurals name="notes_selected">
+        <item quantity="zero">لا عناصر محددة</item>
         <item quantity="one">%d عنصر محدد</item>
-        <item quantity="other">%d عناصر محددة</item>
+        <item quantity="two">%d عنصران محددان</item>
+        <item quantity="few">%d عناصر محددة</item>
+        <item quantity="many">%d عنصرًا محددًا</item>
+        <item quantity="other">%d عنصر محدد</item>
     </plurals>
     <string name="notes_tag_hint">أضف وسوماً …</string>
     <string name="notes_tag_remove">ليس وسمًا</string>
@@ -538,12 +578,20 @@
     <string name="recurrence_weekly">أسبوعي</string>
     <string name="recurring_costs_label">التكاليف المتكررة:</string>
     <plurals name="reminder_in_hours">
+        <item quantity="zero">بعد %1$d ساعة · %2$s</item>
         <item quantity="one">بعد %1$d ساعة · %2$s</item>
-        <item quantity="other">بعد %1$d ساعات · %2$s</item>
+        <item quantity="two">بعد ساعتين · %2$s</item>
+        <item quantity="few">بعد %1$d ساعات · %2$s</item>
+        <item quantity="many">بعد %1$d ساعة · %2$s</item>
+        <item quantity="other">بعد %1$d ساعة · %2$s</item>
     </plurals>
     <plurals name="reminder_in_minutes">
+        <item quantity="zero">بعد %1$d دقيقة · %2$s</item>
         <item quantity="one">بعد %1$d دقيقة · %2$s</item>
-        <item quantity="other">بعد %1$d دقائق · %2$s</item>
+        <item quantity="two">بعد دقيقتين · %2$s</item>
+        <item quantity="few">بعد %1$d دقائق · %2$s</item>
+        <item quantity="many">بعد %1$d دقيقة · %2$s</item>
+        <item quantity="other">بعد %1$d دقيقة · %2$s</item>
     </plurals>
     <string name="reminder_now">الآن · %1$s</string>
     <string name="report_from_15th">بدءًا من 15</string>
@@ -678,7 +726,11 @@
     <string name="tag_delete_text">أزل “#%1$s” من كل الملاحظات. ستبقى الملاحظات كما هي.</string>
     <string name="tag_delete_with_notes">حذف الوسم والملاحظات</string>
     <plurals name="tag_delete_with_notes_text">
+        <item quantity="zero">احذف “#%1$s” من دون ملاحظات. لا يمكن التراجع عن ذلك.</item>
         <item quantity="one">احذف “#%1$s” والملاحظة %2$d التي تحملها. لا يمكن التراجع عن ذلك.</item>
+        <item quantity="two">احذف “#%1$s” والملاحظتين %2$d اللتين تحملانهما. لا يمكن التراجع عن ذلك.</item>
+        <item quantity="few">احذف “#%1$s” والملاحظات الـ%2$d التي تحملها. لا يمكن التراجع عن ذلك.</item>
+        <item quantity="many">احذف “#%1$s” والملاحظة الـ%2$d التي تحملها. لا يمكن التراجع عن ذلك.</item>
         <item quantity="other">احذف “#%1$s” وجميع الملاحظات الـ%2$d التي تحملها. لا يمكن التراجع عن ذلك.</item>
     </plurals>
     <string name="task_done">تم</string>
@@ -693,7 +745,11 @@
     <string name="trash_delete_all_dialog_text">سيتم حذف جميع الملاحظات في سلة المهملات نهائيًا.</string>
     <string name="trash_delete_all_dialog_title">إفراغ سلة المهملات؟</string>
     <plurals name="trash_delete_confirm_text">
+        <item quantity="zero">لا توجد ملاحظات ستحذف نهائيًا. لا يمكن التراجع عن هذا.</item>
         <item quantity="one">%d ملاحظة ستحذف نهائيًا. لا يمكن التراجع عن هذا.</item>
+        <item quantity="two">%d ملاحظتان ستحذفان نهائيًا. لا يمكن التراجع عن هذا.</item>
+        <item quantity="few">%d ملاحظات ستحذف نهائيًا. لا يمكن التراجع عن هذا.</item>
+        <item quantity="many">%d ملاحظة ستحذف نهائيًا. لا يمكن التراجع عن هذا.</item>
         <item quantity="other">%d ملاحظات ستحذف نهائيًا. لا يمكن التراجع عن هذا.</item>
     </plurals>
     <string name="trash_delete_confirm_title">حذف نهائي؟</string>
@@ -701,12 +757,20 @@
     <string name="trash_restore">استعادة</string>
     <string name="trash_restore_all">استعادة الكل</string>
     <plurals name="trash_restore_confirm_text">
+        <item quantity="zero">لا توجد ملاحظات تعود إلى ملاحظاتك.</item>
         <item quantity="one">%d ملاحظة تعود إلى ملاحظاتك.</item>
+        <item quantity="two">%d ملاحظتان تعودان إلى ملاحظاتك.</item>
+        <item quantity="few">%d ملاحظات تعود إلى ملاحظاتك.</item>
+        <item quantity="many">%d ملاحظة تعود إلى ملاحظاتك.</item>
         <item quantity="other">%d ملاحظات تعود إلى ملاحظاتك.</item>
     </plurals>
     <string name="trash_restore_confirm_title">استعادة؟</string>
     <plurals name="trash_tag_text">
+        <item quantity="zero">لا توجد ملاحظات في سلة المهملات تحمل هذا الوسم.</item>
         <item quantity="one">%d ملاحظة في سلة المهملات تحمل هذا الوسم.</item>
+        <item quantity="two">%d ملاحظتان في سلة المهملات تحملان هذا الوسم.</item>
+        <item quantity="few">%d ملاحظات في سلة المهملات تحمل هذا الوسم.</item>
+        <item quantity="many">%d ملاحظة في سلة المهملات تحمل هذا الوسم.</item>
         <item quantity="other">%d ملاحظات في سلة المهملات تحمل هذا الوسم.</item>
     </plurals>
     <string name="undo">تراجع</string>
