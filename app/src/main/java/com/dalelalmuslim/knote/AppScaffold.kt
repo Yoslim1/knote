@@ -132,6 +132,7 @@ fun KnoteApp(
     LaunchedEffect(calendarMonth) { tasksVm.setMonth(calendarMonth) }
 
     val appContext = LocalContext.current
+    val configuration = LocalConfiguration.current
     val appliedLanguage by settingsVm.appliedLanguage.collectAsStateWithLifecycle()
     LaunchedEffect(appliedLanguage) {
         val lang = appliedLanguage ?: return@LaunchedEffect
@@ -150,7 +151,6 @@ fun KnoteApp(
             }
         }
     }
-    val configuration = LocalConfiguration.current
     val localizedContext = remember(appliedLanguage, configuration) {
         AppLocalePreferences.localizedContext(appContext, appliedLanguage)
     }
