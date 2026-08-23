@@ -5,6 +5,8 @@ package com.dalelalmuslim.knote
 import android.Manifest
 import android.app.LocaleManager
 import android.os.Build
+import android.text.TextUtils
+import android.view.View
 import android.content.pm.PackageManager
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -13,7 +15,6 @@ import androidx.core.content.ContextCompat
 import com.dalelalmuslim.knote.notification.ReminderScheduler
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import java.util.Locale as JavaLocale
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -31,7 +32,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dalelalmuslim.knote.holidays.localizedFor
 import com.dalelalmuslim.knote.ui.strings.AppStrings
@@ -155,7 +156,7 @@ fun KnoteApp(
     }
     val appStrings = remember(localizedContext, configuration) { AppStrings(localizedContext) }
     val appLayoutDirection = remember(appStrings.locale) {
-        if (JavaLocale.getLayoutDirection(appStrings.locale) == JavaLocale.LAYOUT_DIRECTION_RTL) {
+        if (TextUtils.getLayoutDirectionFromLocale(appStrings.locale) == View.LAYOUT_DIRECTION_RTL) {
             LayoutDirection.Rtl
         } else {
             LayoutDirection.Ltr
