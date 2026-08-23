@@ -380,7 +380,7 @@
     <string name="meditation_journal_singular">ملاحظة</string>
     <plurals name="meditation_minutes">
         <item quantity="one">%d دقيقة</item>
-        <item quantity="one">%d دقائق</item>
+        <item quantity="other">%d دقائق</item>
     </plurals>
     <string name="meditation_minutes_label">دق</string>
     <string name="meditation_month_days">%1$d من 30 يومًا</string>
@@ -496,7 +496,7 @@
     <string name="notes_search_hint">بحث …</string>
     <plurals name="notes_selected">
         <item quantity="one">%d عنصر محدد</item>
-        <item quantity="one">%d عناصر محددة</item>
+        <item quantity="other">%d عناصر محددة</item>
     </plurals>
     <string name="notes_tag_hint">أضف وسوماً …</string>
     <string name="notes_tag_remove">ليس وسمًا</string>
