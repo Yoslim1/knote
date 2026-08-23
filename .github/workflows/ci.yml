@@ -53,6 +53,9 @@ jobs:
       - name: Assemble debug APK
         run: ./gradlew :app:assembleDebug --stacktrace
 
+      - name: Compile Android instrumented tests
+        run: ./gradlew :app:assembleDebugAndroidTest --stacktrace
+
       - name: Upload unit test report
         if: always()
         uses: actions/upload-artifact@v4
