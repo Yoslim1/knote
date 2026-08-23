@@ -60,7 +60,7 @@ internal fun HabitRow(
 ) {
     val strings      = LocalAppStrings.current
     val colors       = LocalAppColors.current
-    val accent       = Color(0xFF3D5AFE)
+    val accent       = colors.accent
     val focusManager = LocalFocusManager.current
 
     var showDeleteDialog       by remember { mutableStateOf(false) }

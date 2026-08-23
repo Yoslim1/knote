@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.dalelalmuslim.knote.data.*
 import com.dalelalmuslim.knote.repository.AppRepository
+import com.dalelalmuslim.knote.ui.locale.AppLocalePreferences
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -44,8 +45,12 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         repo.updateSettings(settings.value.copy(fontScale = scale))
     }
 
-    fun setLanguage(lang: String) = viewModelScope.launch {
-        repo.updateSettings(settings.value.copy(language = lang))
+    fun setLanguage(lang: String) {
+        val normalized = AppLocalePreferences.normalize(lang)
+        viewModelScope.launch {
+            repo.updateSettings(settings.value.copy(language = normalized))
+            AppLocalePreferences.write(getApplication(), normalized)
+        }
     }
 
     fun setSalary(amount: Double) = viewModelScope.launch {

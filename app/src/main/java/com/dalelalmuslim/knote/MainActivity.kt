@@ -2,6 +2,7 @@
 
 package com.dalelalmuslim.knote
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
@@ -24,12 +25,12 @@ import com.dalelalmuslim.knote.security.SecurityGate
 import com.dalelalmuslim.knote.security.WrongPassphraseException
 import com.dalelalmuslim.knote.security.WrongRecoveryCodeException
 import com.dalelalmuslim.knote.security.wipe
+import com.dalelalmuslim.knote.ui.locale.AppLocalePreferences
 import com.dalelalmuslim.knote.ui.screens.LockScreen
 import com.dalelalmuslim.knote.ui.screens.PostRecoveryLockSetup
 import com.dalelalmuslim.knote.ui.screens.SecBusyDialog
 import com.dalelalmuslim.knote.ui.screens.SecConfirmDialog
 import javax.crypto.Cipher
-import java.util.Locale as JavaLocale
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.withResumed
 import kotlinx.coroutines.launch
@@ -53,6 +54,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 class MainActivity : FragmentActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLocalePreferences.wrap(newBase))
+    }
 
     private val _addTaskTrigger  = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val _openTodayTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
@@ -548,12 +553,8 @@ class MainActivity : FragmentActivity() {
     }
 }
 
-internal fun localeListForSetting(setting: String): LocaleList = when (setting) {
-    "", "AUTO" -> LocaleList.getEmptyLocaleList()
-    "DE" -> LocaleList.forLanguageTags("de")
-    "EN" -> LocaleList.forLanguageTags("en")
-    else -> LocaleList.forLanguageTags(setting)
-}
+internal fun localeListForSetting(setting: String): LocaleList =
+    AppLocalePreferences.localeListForSetting(setting)
 
 private sealed interface GateState {
     data object Loading : GateState

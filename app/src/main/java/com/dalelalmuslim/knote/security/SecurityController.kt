@@ -12,6 +12,8 @@ import com.dalelalmuslim.knote.data.DatabaseProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+const val SECURITY_ERROR_GENERIC = "security_error_generic"
+
 @Stable
 class SecurityController(
     private val appContext: Context,
@@ -66,7 +68,7 @@ class SecurityController(
             refresh()
             onRecoveryCode(code)
         } catch (e: Exception) {
-            lastError = e.message
+            lastError = SECURITY_ERROR_GENERIC
         } finally {
             busy = false
         }
@@ -80,7 +82,7 @@ class SecurityController(
             val code = provisionRecoveryCode(liveDek())
             onRecoveryCode(code)
         } catch (e: Exception) {
-            lastError = e.message
+            lastError = SECURITY_ERROR_GENERIC
         } finally {
             busy = false
         }
@@ -109,7 +111,7 @@ class SecurityController(
         } catch (e: WrongPassphraseException) {
             onWrong()
         } catch (e: Exception) {
-            lastError = e.message
+            lastError = SECURITY_ERROR_GENERIC
         } finally {
             busy = false
             currentPassphrase.wipe()
@@ -178,7 +180,7 @@ class SecurityController(
             refresh()
             onDone(code)
         } catch (e: Exception) {
-            lastError = e.message
+            lastError = SECURITY_ERROR_GENERIC
             onDone(null)
         } finally {
             busy = false
@@ -205,7 +207,7 @@ class SecurityController(
         } catch (e: WrongPassphraseException) {
             onWrong()
         } catch (e: Exception) {
-            lastError = e.message
+            lastError = SECURITY_ERROR_GENERIC
         } finally {
             busy = false
             oldPassphrase.wipe()
@@ -235,7 +237,7 @@ class SecurityController(
             refresh()
             onDone()
         } catch (e: Exception) {
-            lastError = e.message
+            lastError = SECURITY_ERROR_GENERIC
         } finally {
             busy = false
         }

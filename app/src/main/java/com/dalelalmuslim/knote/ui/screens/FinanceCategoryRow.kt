@@ -99,7 +99,7 @@ internal fun CategoryRow(
             Icon(
                 Icons.Default.Remove,
                 contentDescription = null,
-                tint = if (amount > 0.0) Color(0xFF3D5AFE) else Color(0xFFCCCCCC),
+                tint = if (amount > 0.0) colors.accent else colors.onSurfaceTertiary,
                 modifier = Modifier.size(20.dp)
             )
         }
@@ -154,7 +154,7 @@ internal fun CategoryRow(
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.Default.Add, contentDescription = null, tint = Color(0xFF3D5AFE), modifier = Modifier.size(20.dp))
+            Icon(Icons.Default.Add, contentDescription = null, tint = colors.accent, modifier = Modifier.size(20.dp))
         }
     }
 
@@ -173,7 +173,7 @@ internal fun CategoryRow(
                         textAlign = TextAlign.Start
                     ),
                     singleLine = true,
-                    cursorBrush = SolidColor(Color(0xFF3D5AFE)),
+                    cursorBrush = SolidColor(colors.accent),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = { focusManagerDialog.clearFocus() }),
                     decorationBox = { inner ->

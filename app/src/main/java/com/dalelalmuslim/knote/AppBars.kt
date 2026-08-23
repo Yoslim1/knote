@@ -49,7 +49,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlinx.collections.immutable.ImmutableList
 
-private val AccentBlue = Color(0xFF3D5AFE)
+private val DefaultAccent = Color(0xFF5B5BD6)
 
 @Composable
 internal fun TodayTopBar(
@@ -59,6 +59,7 @@ internal fun TodayTopBar(
     onOpenSettings: () -> Unit
 ) {
     val strings = LocalAppStrings.current
+    val colors = LocalAppColors.current
     val today = LocalDate.now()
     val dayLabel = when (selectedDate) {
         today              -> strings.today
@@ -74,10 +75,10 @@ internal fun TodayTopBar(
         subtitle = selectedDate.format(DateTimeFormatter.ofPattern("d. MMMM yyyy", strings.locale)),
         trailing = {
             IconButton(onClick = soundClick(onOpenCalendar)) {
-                Icon(Icons.Default.CalendarMonth, contentDescription = strings.calendarTitle, tint = AccentBlue)
+                Icon(Icons.Default.CalendarMonth, contentDescription = strings.calendarTitle, tint = colors.accent)
             }
             IconButton(onClick = soundClick(onOpenSettings)) {
-                Icon(Icons.Default.Settings, contentDescription = strings.settings, tint = AccentBlue)
+                Icon(Icons.Default.Settings, contentDescription = strings.settings, tint = colors.accent)
             }
         }
     )
@@ -95,11 +96,12 @@ internal fun NotesTopBar(
     onPinSelected: () -> Unit,
     onSetColor: (Int) -> Unit,
     /** Colour of the open note, for the editor's controls. */
-    editorAccent: Color = AccentBlue,
+    editorAccent: Color = DefaultAccent,
     onOpenTrash: () -> Unit,
     onOpenSettings: () -> Unit
 ) {
     val strings = LocalAppStrings.current
+    val colors = LocalAppColors.current
     // With every selected note already pinned, the action unpins instead.
     val allSelectedPinned = selectedNoteIds.isNotEmpty() &&
         notes.filter { it.id in selectedNoteIds }.all { it.isPinned }
@@ -128,11 +130,11 @@ internal fun NotesTopBar(
         // either sit out of sight or drag the reader away from the note.
         val selected = notes.filter { it.id in selectedNoteIds }
         Column(modifier = modifier) {
-        AppTopBar(
+            AppTopBar(
             title    = strings.notesSelected(selectedNoteIds.size),
             leading  = {
                 IconButton(onClick = soundClick(onClearSelection)) {
-                    Icon(Icons.Default.Close, contentDescription = strings.cancel, tint = AccentBlue)
+                    Icon(Icons.Default.Close, contentDescription = strings.cancel, tint = colors.accent)
                 }
             },
             trailing = {
@@ -142,14 +144,14 @@ internal fun NotesTopBar(
                         imageVector = if (allSelectedPinned) Icons.Default.PushPin else Icons.Outlined.PushPin,
                         contentDescription = if (allSelectedPinned) strings.notesUnpinAction
                                              else strings.notesPinAction,
-                        tint = AccentBlue
+                        tint = colors.accent
                     )
                 }
                 IconButton(onClick = soundClick(onDeleteSelected)) {
-                    Icon(Icons.Default.DeleteSweep, contentDescription = strings.notesDeleteSelected, tint = AccentBlue)
+                    Icon(Icons.Default.DeleteSweep, contentDescription = strings.notesDeleteSelected, tint = colors.accent)
                 }
             }
-        )
+            )
             NoteColorPicker(
                 current  = selected.map { it.color }.distinct().singleOrNull(),
                 onPick   = onSetColor,
@@ -166,10 +168,10 @@ internal fun NotesTopBar(
             ),
             trailing = {
                 IconButton(onClick = soundClick(onOpenTrash)) {
-                    Icon(Icons.Default.Delete, contentDescription = strings.trash, tint = AccentBlue)
+                    Icon(Icons.Default.Delete, contentDescription = strings.trash, tint = colors.accent)
                 }
                 IconButton(onClick = soundClick(onOpenSettings)) {
-                    Icon(Icons.Default.Settings, contentDescription = strings.settings, tint = AccentBlue)
+                    Icon(Icons.Default.Settings, contentDescription = strings.settings, tint = colors.accent)
                 }
             }
         )
@@ -185,19 +187,20 @@ internal fun FinanceTopBar(
     onOpenSettings: () -> Unit
 ) {
     val strings = LocalAppStrings.current
+    val colors = LocalAppColors.current
     AppTopBar(
         modifier = modifier,
         title    = strings.tabFinance,
         subtitle = selectedDate.format(DateTimeFormatter.ofPattern("d. MMMM yyyy", strings.locale)),
         trailing = {
             IconButton(onClick = soundClick(onOpenMonthlyOverview)) {
-                Icon(Icons.Default.BarChart, contentDescription = strings.monthlyOverviewTitle, tint = AccentBlue)
+                Icon(Icons.Default.BarChart, contentDescription = strings.monthlyOverviewTitle, tint = colors.accent)
             }
             IconButton(onClick = soundClick(onOpenBudget)) {
-                Icon(Icons.Default.Savings, contentDescription = strings.budgetDialogTitle, tint = AccentBlue)
+                Icon(Icons.Default.Savings, contentDescription = strings.budgetDialogTitle, tint = colors.accent)
             }
             IconButton(onClick = soundClick(onOpenSettings)) {
-                Icon(Icons.Default.Settings, contentDescription = strings.settings, tint = AccentBlue)
+                Icon(Icons.Default.Settings, contentDescription = strings.settings, tint = colors.accent)
             }
         }
     )
@@ -263,13 +266,15 @@ private fun AppTopBar(
                     titleIcon()
                     Spacer(Modifier.width(8.dp))
                 }
-                Text(title, fontSize = 26.sp, fontWeight = FontWeight.Bold, color = colors.onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(title, fontSize = 24.sp, fontWeight = FontWeight.Bold, color = colors.onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             if (subtitle != null) {
                 Text(
                     text     = subtitle,
                     fontSize = 13.sp,
                     color    = colors.onSurfaceSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = if (onSubtitleClick != null)
                         Modifier.clickable(onClick = onSubtitleClick)
                     else Modifier

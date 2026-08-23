@@ -4,6 +4,34 @@ package com.dalelalmuslim.knote.ui.screens
 
 internal const val TIP_INTERVAL_MS = 60_000L
 
+internal val TIPS_AR = listOf(
+    "تنفّس بهدوء لأربع عدّات، ثم أخرج النفس ببطء لست عدّات.",
+    "عندما يتشتت الذهن، عُد بلطف إلى التنفس من دون إصدار أحكام.",
+    "لا تحاول تغيير شيء؛ راقب ما يحدث كما هو.",
+    "تفقّد جسدك من الداخل: القدمين والساقين والبطن والصدر واليدين.",
+    "دع كل فكرة تمر مثل سحابة تعبر السماء.",
+    "وجّه انتباهك إلى الوقفة الطبيعية بين الشهيق والزفير.",
+    "عندما تظهر الأصوات، لاحظها من دون تصنيف أو حكم.",
+    "أنت المراقب، ولست الشيء الذي تتم مراقبته.",
+    "مع كل زفير، اسمح لنفسك بأن تترك شيئًا من التوتر.",
+    "أرخِ جبهتك وفكّك وكتفيك ويديك بوعي.",
+    "اشعر بنقاط تماس جسدك مع الأرض أو المقعد.",
+    "تخيّل أن قلبك يتنفس بلطف وبإيقاع هادئ.",
+    "ابتسامة داخلية رقيقة تساعد الجسد كله على الاسترخاء.",
+    "هذه اللحظة مكتملة، ولا ينقصها شيء.",
+    "عدّ عشرة أنفاس بصمت، ثم ابدأ من جديد.",
+    "لاحظ الموضع الذي تشعر فيه بالتنفس بأوضح صورة.",
+    "أرسل لنفسك أمنية بالراحة: لعلني أكون سعيدًا ومطمئنًا.",
+    "وسّعها إلى الآخرين: لعل جميع الكائنات تكون سعيدة وخالية من المعاناة.",
+    "عند القلق، تنفّس بعمق نحو البطن؛ فهذا يساعد الجهاز العصبي على الهدوء.",
+    "تخيّل ذهنك بحيرة ساكنة؛ الأفكار أمواج تظهر ثم تنحسر.",
+    "بعد كل زفير، توقّف لحظة قصيرة؛ ففي هذه المساحة سكون عميق.",
+    "اليقظة لا تعني إفراغ الذهن، بل مراقبته بلطف.",
+    "كرّر في داخلك: أنا هادئ، أنا حاضر، وأنا كافٍ.",
+    "وجّه انتباهك إلى الجسد كله، كأنه مجال حي من الإحساس.",
+    "في نهاية الجلسة، خذ نفسًا عميقًا واحدًا، ثم عد إلى المكان بامتنان.",
+)
+
 internal val TIPS_DE = listOf(
     "Atme ruhig ein – vier Zählzeiten – und langsam aus – sechs Zählzeiten.",
     "Wenn dein Geist wandert, kehre sanft und ohne Urteil zum Atem zurück.",
@@ -29,7 +57,7 @@ internal val TIPS_DE = listOf(
     "Achtsamkeit bedeutet nicht, den Geist zu leeren, sondern ihn freundlich zu beobachten.",
     "Wiederhole innerlich: «Ich bin ruhig. Ich bin hier. Ich bin genug.»",
     "Richte deine Aufmerksamkeit auf den Körper als Ganzes – als lebendiges Feld der Empfindungen.",
-    "Am Ende jeder Sitzung: ein tiefer Atemzug – und kehre dankbar in den Raum zurück."
+    "Am Ende jeder Sitzung: ein tiefer Atemzug – und kehre dankbar in den Raum zurück.",
 )
 
 internal val TIPS_EN = listOf(
@@ -57,5 +85,5 @@ internal val TIPS_EN = listOf(
     "Mindfulness doesn't mean emptying the mind, but observing it with kindness.",
     "Repeat inwardly: «I am calm. I am here. I am enough.»",
     "Bring attention to the body as a whole – a living field of sensation.",
-    "At the end of the session, one deep breath – and return to the room with gratitude."
+    "At the end of the session, one deep breath – and return to the room with gratitude.",
 )

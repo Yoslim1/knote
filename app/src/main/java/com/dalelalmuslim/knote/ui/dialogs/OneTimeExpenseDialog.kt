@@ -82,8 +82,8 @@ internal fun OneTimeExpenseDialog(
                             .fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor   = Color(0xFF3D5AFE),
-                            unfocusedBorderColor = Color(0xFFDDDDDD)
+                            focusedBorderColor   = colors.accent,
+                            unfocusedBorderColor = colors.divider
                         )
                     )
                     ExposedDropdownMenu(
@@ -154,7 +154,7 @@ internal fun OneTimeExpenseDialog(
                         textAlign = TextAlign.Start
                     ),
                     singleLine = true,
-                    cursorBrush = SolidColor(Color(0xFF3D5AFE)),
+                    cursorBrush = SolidColor(colors.accent),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                     decorationBox = { inner ->

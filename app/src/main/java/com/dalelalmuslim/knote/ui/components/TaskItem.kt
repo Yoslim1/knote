@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
@@ -59,6 +60,7 @@ fun TaskItem(
     onOpenLinkedNote: (() -> Unit)? = null
 ) {
     val strings = LocalAppStrings.current
+    val colors = LocalAppColors.current
     var showDeleteDialog      by remember { mutableStateOf(false) }
     var deleteResetTrigger    by remember { mutableIntStateOf(0) }
     val prevDeleteShown        = remember { mutableStateOf(false) }
@@ -68,9 +70,9 @@ fun TaskItem(
     }
 
     SwipeToReveal(
-        startAction  = SwipeAction(Icons.Default.CalendarMonth, Color(0xFF1976D2), onButtonClick = onPickDate, onAction = onMoveToTomorrow),
+        startAction  = SwipeAction(Icons.Default.CalendarMonth, colors.accent, onButtonClick = onPickDate, onAction = onMoveToTomorrow),
         resetTrigger = swipeResetTrigger + deleteResetTrigger,
-        endAction    = SwipeAction(Icons.Default.Delete, Color(0xFFD32F2F), onAction = {
+        endAction    = SwipeAction(Icons.Default.Delete, MaterialTheme.colorScheme.error, onAction = {
             if (confirmDeleteEnabled) showDeleteDialog = true else onDelete()
         })
     ) {
@@ -91,7 +93,7 @@ fun TaskItem(
             text  = { Text(strings.deleteTaskDialogText(task.title)) },
             confirmButton = {
                 TextButton(onClick = soundClick { showDeleteDialog = false; onDelete() }) {
-                    Text(strings.delete, color = Color(0xFFD32F2F))
+                    Text(strings.delete, color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
@@ -189,7 +191,7 @@ private fun TaskContent(
                     }
                 },
             textStyle = TextStyle(fontSize = 16.sp, color = colors.onSurface),
-            cursorBrush = SolidColor(if (isFocused) Color.Black else Color.Transparent),
+            cursorBrush = SolidColor(if (isFocused) colors.accent else Color.Transparent),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
         )
@@ -216,7 +218,7 @@ private fun TaskContent(
                 Icon(
                     imageVector        = Icons.AutoMirrored.Filled.Article,
                     contentDescription = null,
-                    tint               = Color(0xFF3D5AFE),
+                    tint               = colors.accent,
                     modifier           = Modifier
                         .size(18.dp)
                         .clickable { onOpenLinkedNote() }
@@ -229,7 +231,7 @@ private fun TaskContent(
             Icon(
                 imageVector = Icons.Default.DragHandle,
                 contentDescription = null,
-                tint = Color(0xFFCCCCCC),
+                tint = colors.onSurfaceTertiary,
                 modifier = Modifier
                     .size(24.dp)
                     .then(modifier)

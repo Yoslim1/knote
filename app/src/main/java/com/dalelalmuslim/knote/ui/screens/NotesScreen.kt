@@ -56,7 +56,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 
-internal val NoteAccent = Color(0xFF3D5AFE)
+internal val NoteAccent = Color(0xFF5B5BD6)
 
 data class NoteEditorBarState(
     val title: String,
@@ -156,7 +156,7 @@ fun NotesScreen(
             } else onOpenNote(note)
         }
         LazyVerticalGrid(
-            columns  = GridCells.Fixed(2),
+            columns  = GridCells.Adaptive(minSize = 156.dp),
             state    = gridState,
             modifier = Modifier.fillMaxSize().endSearchOnOutsideTap(searchFocus),
             contentPadding = PaddingValues(
@@ -391,11 +391,11 @@ private fun SectionHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text          = label.uppercase(),
-            fontSize      = 11.sp,
+            text          = label,
+            fontSize      = 12.sp,
             fontWeight    = FontWeight.SemiBold,
             color         = colors.onSurfaceSecondary,
-            letterSpacing = 0.8.sp
+            letterSpacing = 0.2.sp
         )
         if (onClick != null) {
             Spacer(Modifier.width(5.dp))

@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.sp
 import com.dalelalmuslim.knote.ui.strings.LocalAppStrings
 import com.dalelalmuslim.knote.ui.theme.LocalAppColors
 
-private val ToolbarAccent = Color(0xFF3D5AFE)
+private val ToolbarAccent = Color(0xFF5B5BD6)
 
 /** Material's minimum touch target; chips draw at least this wide so the gaps stay even. */
 private val ChipMinWidth = 48.dp

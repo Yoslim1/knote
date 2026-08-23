@@ -89,10 +89,8 @@ Package map under `app/src/main/java/com/dalelalmuslim/knote/`:
 | `export/` | PDF / HTML / ZIP / recovery-code exporters |
 | `icon/` | Launcher icon switching (`IconSwitcher`, activity aliases) |
 
-Localization: `res/values*` contains strings for `en, de, es, fr, it, pt, pt-rPT,
-pt-rBR, nl, pl` and `ar`. The shipped set is the 9 non-Arabic locales, enforced by
-`androidResources.localeFilters` and `res/xml/locales_config.xml`; the `values-ar/`
-resources exist but are not packaged (`ar` is absent from both lists).
+Localization: `res/values*` contains the English resource contract and a complete Arabic resource set. The shipped set is intentionally limited to `en` and `ar`, enforced by `androidResources.localeFilters` and `res/xml/locales_config.xml`. The selected language is mirrored in a non-sensitive preference so the lock screen and Android 26–32 can apply it before the encrypted database is opened; the unlocked Compose tree also provides an explicit `LocalLayoutDirection`.
+
 
 ---
 
@@ -224,10 +222,8 @@ Two clearly separated layers:
   `collectCopyrightYears`, `regenerateLegalData` regenerate
   `app/src/main/res/raw/legal_notices.json` and `copyright_years.json` from the
   resolved classpath.
-- **CI:** no workflow files (`.github/` etc.) are present in this checkout, so
-  CI behavior is **Not verified** from the repository itself. The README and
-  `PROJECT_CONTEXT.md` reference GitHub Actions signed APKs, but that claim is
-  not backed by any file in this repository.
+- **CI:** `.github/workflows/ci.yml` runs JVM unit tests, Android lint, and a debug build. `release.yml` builds and signs release APKs from version tags, verifies the signature, and publishes checksums. `update-lint-baseline.yml` is a manual maintenance workflow.
+
 
 ---
 

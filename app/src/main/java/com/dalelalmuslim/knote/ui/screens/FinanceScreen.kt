@@ -32,28 +32,20 @@ import com.dalelalmuslim.knote.data.RecurringCostHistory
 import com.dalelalmuslim.knote.ui.theme.LocalAppColors
 import com.dalelalmuslim.knote.ui.LocalAppCurrency
 import java.time.LocalDate
+import java.util.Locale
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
-internal fun groupColor(group: String): Color = when (group) {
-    "Wohnen"                 -> Color(0xFF1976D2)
-    "Lebensmittel"           -> Color(0xFF43A047)
-    "Essen & Trinken"        -> Color(0xFFE53935)
-    "Transport"              -> Color(0xFF546E7A)
-    "Gesundheit & Körper"    -> Color(0xFF00ACC1)
-    "Kleidung & Accessoires" -> Color(0xFF8E24AA)
-    "Freizeit"               -> Color(0xFFFB8C00)
-    "Sport"                  -> Color(0xFFD84315)
-    "Reisen"                 -> Color(0xFF039BE5)
-    "Digitales"              -> Color(0xFF3949AB)
-    "Bildung"                -> Color(0xFF00897B)
-    "Soziales"               -> Color(0xFFD81B60)
-    "Haustiere"              -> Color(0xFF6D4C41)
-    "Finanzen & Vorsorge"    -> Color(0xFF2E7D32)
-    "Familie & Kinder"       -> Color(0xFFFF6D00)
-    "Beruf & Büro"           -> Color(0xFF37474F)
-    "Sonstiges"              -> Color(0xFF757575)
-    else                     -> Color(0xFF9E9E9E)
+private val GroupPalette = listOf(
+    Color(0xFF4F46E5), Color(0xFF0F766E), Color(0xFFDC2626), Color(0xFF0369A1),
+    Color(0xFF9333EA), Color(0xFFEA580C), Color(0xFF15803D), Color(0xFFBE185D),
+    Color(0xFF475569), Color(0xFFB45309), Color(0xFF0891B2), Color(0xFF64748B),
+)
+
+/** Stable color per persisted group, independent of the UI language. */
+internal fun groupColor(group: String): Color {
+    val index = (group.lowercase(Locale.ROOT).hashCode() and Int.MAX_VALUE) % GroupPalette.size
+    return GroupPalette[index]
 }
 
 @Composable

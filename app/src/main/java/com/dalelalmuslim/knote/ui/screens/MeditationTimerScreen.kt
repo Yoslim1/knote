@@ -120,7 +120,11 @@ fun MeditationTimerScreen(
     val isPaused   = timerState.isPaused
     val hasSession = isRunning || isPaused
 
-    val tips = if (strings.locale.language == "de") TIPS_DE else TIPS_EN
+    val tips = when (strings.locale.language) {
+        "ar" -> TIPS_AR
+        "de" -> TIPS_DE
+        else -> TIPS_EN
+    }
     var tipIndex by remember { mutableIntStateOf((0 until tips.size).random()) }
     LaunchedEffect(isRunning) {
         if (isRunning) {

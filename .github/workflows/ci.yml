@@ -36,6 +36,11 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Validate XML and locale parity
+        run: |
+          python3 tools/validate_xml.py
+          python3 tools/audit_locales.py
+
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 

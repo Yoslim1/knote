@@ -41,6 +41,33 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Validate release version
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_REF_TYPE:-branch}" != "tag" ]]; then
+            echo "Manual workflow run: tag monotonicity check skipped."
+            exit 0
+          fi
+          TAG="${GITHUB_REF_NAME#v}"
+          if [[ ! "$TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Release tags must use vMAJOR.MINOR.PATCH (got $GITHUB_REF_NAME)"
+            exit 1
+          fi
+          version_code() {
+            IFS=. read -r major minor patch <<< "$1"
+            echo $((major * 10000 + minor * 100 + patch))
+          }
+          current_code=$(version_code "$TAG")
+          previous_tag=$(git tag --sort=-v:refname | grep -v "^${GITHUB_REF_NAME}$" | head -n1 || true)
+          if [[ -n "$previous_tag" ]]; then
+            previous_code=$(version_code "${previous_tag#v}")
+            if (( current_code <= previous_code )); then
+              echo "versionCode must increase: $GITHUB_REF_NAME <= $previous_tag"
+              exit 1
+            fi
+          fi
+
       - name: Decode keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/release.keystore
 

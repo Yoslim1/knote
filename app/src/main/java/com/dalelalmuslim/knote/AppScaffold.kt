@@ -30,10 +30,12 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.LocalLayoutDirection
 import androidx.lifecycle.viewmodel.compose.viewModel
-import java.util.Locale
 import com.dalelalmuslim.knote.holidays.localizedFor
 import com.dalelalmuslim.knote.ui.strings.AppStrings
+import com.dalelalmuslim.knote.ui.locale.AppLocalePreferences
 import com.dalelalmuslim.knote.ui.screens.CalendarScreen
 import com.dalelalmuslim.knote.ui.screens.NoteEditorBarState
 import com.dalelalmuslim.knote.ui.screens.FinanceScreen
@@ -132,16 +134,33 @@ fun KnoteApp(
     val appliedLanguage by settingsVm.appliedLanguage.collectAsStateWithLifecycle()
     LaunchedEffect(appliedLanguage) {
         val lang = appliedLanguage ?: return@LaunchedEffect
+        AppLocalePreferences.write(appContext, lang)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val lm = appContext.getSystemService(LocaleManager::class.java)
             val desired = localeListForSetting(lang)
             if (lm != null && lm.applicationLocales != desired) {
                 lm.applicationLocales = desired
             }
+        } else {
+            val targetLocale = AppLocalePreferences.localeForSetting(lang)
+            val currentLocale = appContext.resources.configuration.locales[0]
+            if (targetLocale.language != currentLocale.language) {
+                (appContext as? android.app.Activity)?.recreate()
+            }
         }
     }
     val configuration = LocalConfiguration.current
-    val appStrings = remember(configuration) { AppStrings(appContext) }
+    val localizedContext = remember(appliedLanguage, configuration) {
+        AppLocalePreferences.localizedContext(appContext, appliedLanguage)
+    }
+    val appStrings = remember(localizedContext, configuration) { AppStrings(localizedContext) }
+    val appLayoutDirection = remember(appStrings.locale) {
+        if (JavaLocale.getLayoutDirection(appStrings.locale) == JavaLocale.LAYOUT_DIRECTION_RTL) {
+            LayoutDirection.Rtl
+        } else {
+            LayoutDirection.Ltr
+        }
+    }
 
     val hazeState = rememberHazeState()
     val overlayHost = rememberGlassOverlayHostState()
@@ -156,11 +175,13 @@ fun KnoteApp(
     }
 
     CompositionLocalProvider(
-        LocalAppStrings provides appStrings,
-        LocalAppCurrency provides appCurrency,
-        LocalHazeState provides hazeState,
-        LocalGlassOverlayHost provides overlayHost
-    ) {
+            LocalAppStrings provides appStrings,
+            LocalAppCurrency provides appCurrency,
+            LocalHazeState provides hazeState,
+            LocalGlassOverlayHost provides overlayHost,
+            LocalLayoutDirection provides appLayoutDirection,
+        ) {
+
         val strings = LocalAppStrings.current
 
         val holidayLocalizedCtx = remember(strings.locale) { holidayBaseCtx.localizedFor(strings.locale) }
@@ -405,7 +426,7 @@ fun KnoteApp(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .padding(end = 16.dp, bottom = bottomPadding + 16.dp),
-                    containerColor = Color(0xFF3D5AFE)
+                    containerColor = colors.accent
                 ) {
                     Icon(Icons.Default.Add, contentDescription = strings.add, tint = Color.White)
                 }
@@ -415,7 +436,7 @@ fun KnoteApp(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .padding(end = 16.dp, bottom = bottomPadding + 16.dp),
-                    containerColor = Color(0xFF3D5AFE)
+                    containerColor = colors.accent
                 ) {
                     Icon(Icons.Default.Add, contentDescription = strings.add, tint = Color.White)
                 }
@@ -430,7 +451,7 @@ fun KnoteApp(
             // app's blue.
             val editorAccent = editingNote?.color
                 ?.let { noteAccentColor(it, colors.background.isDarkSurface()) }
-                ?: Color(0xFF3D5AFE)
+                ?: colors.accent
             val topBarModifier = Modifier
                 .align(Alignment.TopCenter)
                 .let { if (editorTint != null) it.background(editorTint) else it.hazeEffect(hazeState, glassStyle) }
@@ -443,7 +464,7 @@ fun KnoteApp(
                     .padding(bottom = bottomPadding + 12.dp, start = 16.dp, end = 16.dp)
             ) { data ->
                 // The action carries the app's accent, like every other one.
-                Snackbar(snackbarData = data, actionContentColor = Color(0xFF3D5AFE))
+                Snackbar(snackbarData = data, actionContentColor = colors.accent)
             }
 
             // Always present now: the note editor is drawn over it instead of

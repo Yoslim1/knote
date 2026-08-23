@@ -19,32 +19,35 @@ data class AppColors(
     val bottomBar: Color,
 )
 
+private val LightAccent = Color(0xFF5B5BD6)
+private val DarkAccent = Color(0xFFA8A7FF)
+
 val LightAppColors = AppColors(
-    background          = Color(0xFFF5F5F5),
-    surface             = Color.White,
-    surfaceVariant      = Color(0xFFF8F9FA),
-    onSurface           = Color(0xFF1A1A1A),
-    onSurfaceSecondary  = Color(0xFF666666),
-    onSurfaceTertiary   = Color(0xFFBBBBBB),
-    accent              = Color(0xFF3D5AFE),
-    accentContainer     = Color(0xFFE8EAFE),
-    divider             = Color(0xFFEEEEEE),
-    topBar              = Color.White,
-    bottomBar           = Color.White,
+    background          = Color(0xFFF7F7FA),
+    surface             = Color(0xFFFFFFFF),
+    surfaceVariant      = Color(0xFFF0F1F7),
+    onSurface           = Color(0xFF1B1C24),
+    onSurfaceSecondary  = Color(0xFF616372),
+    onSurfaceTertiary   = Color(0xFF9294A0),
+    accent              = LightAccent,
+    accentContainer     = Color(0xFFE9E9FF),
+    divider             = Color(0xFFE3E4EC),
+    topBar              = Color(0xFFFFFFFF),
+    bottomBar           = Color(0xFFFFFFFF),
 )
 
 val DarkAppColors = AppColors(
-    background          = Color(0xFF0E0E0E),
-    surface             = Color(0xFF1C1C1C),
-    surfaceVariant      = Color(0xFF161616),
-    onSurface           = Color(0xFFE8E8E8),
-    onSurfaceSecondary  = Color(0xFF9E9E9E),
-    onSurfaceTertiary   = Color(0xFF4A4A4A),
-    accent              = Color(0xFF3D5AFE),
-    accentContainer     = Color(0xFF151C3D),
-    divider             = Color(0xFF2A2A2A),
-    topBar              = Color(0xFF1C1C1C),
-    bottomBar           = Color(0xFF1C1C1C),
+    background          = Color(0xFF11121A),
+    surface             = Color(0xFF1B1D28),
+    surfaceVariant      = Color(0xFF242634),
+    onSurface           = Color(0xFFF4F4FA),
+    onSurfaceSecondary  = Color(0xFFB6B7C6),
+    onSurfaceTertiary   = Color(0xFF7B7D8C),
+    accent              = DarkAccent,
+    accentContainer     = Color(0xFF2D2D58),
+    divider             = Color(0xFF343646),
+    topBar              = Color(0xFF1B1D28),
+    bottomBar           = Color(0xFF1B1D28),
 )
 
 val LocalAppColors = staticCompositionLocalOf { LightAppColors }

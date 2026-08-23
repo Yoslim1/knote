@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dalelalmuslim.knote.data.AppSettings
 import com.dalelalmuslim.knote.security.KeyMode
+import com.dalelalmuslim.knote.security.SECURITY_ERROR_GENERIC
 import com.dalelalmuslim.knote.security.LocalSecurityController
 import com.dalelalmuslim.knote.ui.theme.LocalAppColors
 
@@ -138,9 +139,14 @@ internal fun SicherheitSection(
             }
         }
 
-        controller.lastError?.let {
+        controller.lastError?.let { error ->
             Spacer(Modifier.height(12.dp))
-            Text(it, color = Color(0xFFFF6B6B), fontSize = 13.sp, modifier = Modifier.padding(horizontal = 4.dp))
+            Text(
+                text = if (error == SECURITY_ERROR_GENERIC) s.securityErrorGeneric else error,
+                color = Color(0xFFFF6B6B),
+                fontSize = 13.sp,
+                modifier = Modifier.padding(horizontal = 4.dp),
+            )
         }
 
         Spacer(Modifier.height(24.dp))

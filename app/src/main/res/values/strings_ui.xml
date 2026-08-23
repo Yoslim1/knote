@@ -446,6 +446,7 @@
     <string name="bio_confirm_subtitle">Confirm with biometrics or device PIN</string>
     <string name="wrong_passphrase">Wrong passphrase</string>
     <string name="wrong_recovery_code">Wrong recovery code</string>
+    <string name="security_error_generic">Something went wrong while updating security settings. Your data was not deleted.</string>
 
     <string name="export_section_title">Export</string>
     <string name="export_calendar_title">Calendar</string>

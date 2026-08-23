@@ -175,7 +175,7 @@ fun TaskScreen(
         }
         if (appointments.isNotEmpty() || holidayNames.isNotEmpty()) {
             Text(
-                text = strings.appointmentsSection.uppercase(),
+                text = strings.appointmentsSection,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.onSurfaceSecondary,
@@ -203,7 +203,7 @@ fun TaskScreen(
         if (taskItems.isNotEmpty()) {
             Spacer(Modifier.height(8.dp))
             Text(
-                text = strings.tasksSection.uppercase(),
+                text = strings.tasksSection,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.onSurfaceSecondary,
@@ -271,7 +271,7 @@ fun TaskScreen(
         if (habits.isNotEmpty()) {
             Spacer(Modifier.height(8.dp))
             Text(
-                text = strings.habitsSection.uppercase(),
+                text = strings.habitsSection,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.onSurfaceSecondary,

@@ -74,11 +74,11 @@ Some things are missing on purpose. Knote will never:
 ### 🎨 Personalization
 - Multiple selectable launcher icons
 - Light/dark appearance and personalization options
-- **9 languages**: English, German, Spanish, French, Italian, Portuguese (Portugal & Brazil), Dutch, Polish, with English as fallback
+- **2 languages**: English and Arabic, with English as a safe fallback for future untranslated resources
 
 ## 📥 Download
 
-This is a personal fork, built and signed via GitHub Actions CI. Grab the latest signed APK from the [**Releases**](https://github.com/dalelalmuslim/knote/releases) page, or build it yourself from source.
+This is a personal fork, built and signed via GitHub Actions CI. Grab the latest signed APK from the [**Releases**](https://github.com/Yoslim1/knote/releases) page, or build it yourself from source.
 
 ### Requirements
 - Android 8.0+ (minSdk **26**)
@@ -102,7 +102,7 @@ The full source is public, so you don't have to trust the prebuilt APK: you can 
 ## 🛠 Build from source
 
 ```sh
-git clone https://github.com/dalelalmuslim/knote.git
+git clone https://github.com/Yoslim1/knote.git
 cd knote
 ./gradlew :app:assembleRelease
 ```
