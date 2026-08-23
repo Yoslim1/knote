@@ -53,3 +53,11 @@
 - `PROJECT_CONTEXT.md` states that local Gradle builds are not allowed on this device and GitHub Actions is authoritative.
 - We can still run deterministic static audits, resource consistency checks, XML parsing, Kotlin source checks, and repository tests that do not invoke Gradle.
 - Final build/test verification should be performed by GitHub Actions after changes are pushed to a branch.
+
+## CI verification evidence
+
+- First CI run on commit `695eff4` failed at Android resource merge because the generated Arabic `meditation_minutes` and `notes_selected` plurals contained duplicate `quantity="one"` items. The failure was reported by GitHub Actions at https://github.com/Yoslim1/knote/actions/runs/32629648449.
+- The failure was diagnosed from the AAPT log, corrected by changing the second plural item in each resource to `quantity="other"`, and committed as `389278e`.
+- A second CI run was dispatched for commit `389278e` at https://github.com/Yoslim1/knote/actions/runs/32630000977. Its resource parity step completed successfully; at the latest poll, the JVM unit-test step was still in progress and lint/build steps were pending.
+
+أُجري التحقق المحلي عبر Gradle، لكنه توقف قبل تنفيذ المهام لأن بيئة sandbox لا تحتوي على Android SDK ولا `ANDROID_HOME` صالحًا. لذلك اعتمدت فحوصات Python المحلية وGitHub Actions للبناء الفعلي؛ فـ CI أثبت نجاح compile والاختبارات حتى مرحلة lint في التشغيل السابق، وسيعاد تشغيله على آخر commit.
