@@ -144,7 +144,7 @@ fun KnoteApp(
             }
         } else {
             val targetLocale = AppLocalePreferences.localeForSetting(lang)
-            val currentLocale = appContext.resources.configuration.locales[0]
+            val currentLocale = configuration.locales[0]
             if (targetLocale.language != currentLocale.language) {
                 (appContext as? android.app.Activity)?.recreate()
             }
